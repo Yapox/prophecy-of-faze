@@ -51,7 +51,8 @@ try {
     await centerChapter(page, name);
     await expect.poll(() => art.evaluate(element => Number(getComputedStyle(element).opacity))).toBeGreaterThan(.1);
     const opacity = await art.evaluate(element => Number(getComputedStyle(element).opacity));
-    assert.ok(opacity <= .2, `${name} must remain subdued`);
+    assert.ok(opacity <= .31, `${name} stays behind the readable content`);
+    await expect.poll(() => page.locator(`[data-figure="${name}"] .chapter-content`).evaluate(element => Number(getComputedStyle(element).opacity))).toBe(1);
     assert.equal(await art.evaluate(element => getComputedStyle(element).pointerEvents), 'none');
     assert.equal(await art.locator('img').getAttribute('alt'), '');
     await expect.poll(() => art.locator('img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
@@ -148,7 +149,7 @@ try {
     const art = reduced.locator(`[data-figure="${name}"] .odyssey-art`);
     assert.equal(await art.evaluate(element => getComputedStyle(element).transform), 'none');
     assert.equal(await art.evaluate(element => element.getAnimations().length), 0);
-    assert.equal(await art.evaluate(element => getComputedStyle(element).opacity), '0.13');
+    assert.equal(await art.evaluate(element => getComputedStyle(element).opacity), '0.28');
   }
   await reduced.keyboard.press('Tab');
   await expect(reduced.locator('.skip-link')).toBeFocused();

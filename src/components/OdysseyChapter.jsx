@@ -16,11 +16,12 @@ function Waves() {
 
 function ScrollArtwork({ target, figure, eager, waves }) {
   const { scrollYProgress } = useScroll({ target, offset: ['start end', 'end start'] });
-  const opacity = useTransform(scrollYProgress, [0, 0.22, 0.65, 1], [0, 0.17, 0.17, 0]);
-  const shift = useTransform(scrollYProgress, [0, 1], ['36px', '-36px']);
-  const waveShift = useTransform(scrollYProgress, [0, 1], ['20px', '-20px']);
+  const opacity = useTransform(scrollYProgress, [0, 0.22, 0.65, 1], [0, 0.3, 0.3, 0]);
+  const shift = useTransform(scrollYProgress, [0, 1], ['72px', '-72px']);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.04, 1]);
+  const waveShift = useTransform(scrollYProgress, [0, 1], ['36px', '-36px']);
   return <>
-    <m.div className="odyssey-art" aria-hidden="true" style={{ opacity, '--odyssey-shift': shift }}><Artwork figure={figure} eager={eager} /></m.div>
+    <m.div className="odyssey-art" aria-hidden="true" style={{ opacity, '--odyssey-shift': shift, '--odyssey-scale': scale }}><Artwork figure={figure} eager={eager} /></m.div>
     {waves && <m.div className="odyssey-wave-layer" aria-hidden="true" style={{ opacity, '--wave-shift': waveShift }}><Waves /></m.div>}
   </>;
 }
@@ -30,6 +31,6 @@ export default function OdysseyChapter({ figure, className = '', children, eager
   const reducedMotion = useReducedMotion();
   return <section ref={target} className={`odyssey-chapter chapter-${figure} ${className}`} data-figure={figure} data-motion={reducedMotion ? 'static' : 'scroll'} {...props}>
     {reducedMotion ? <><div className="odyssey-art odyssey-art-static" aria-hidden="true"><Artwork figure={figure} eager={eager} /></div>{waves && <div className="odyssey-wave-layer odyssey-art-static" aria-hidden="true"><Waves /></div>}</> : <ScrollArtwork target={target} figure={figure} eager={eager} waves={waves} />}
-    <div className="chapter-content">{children}</div>
+    <m.div className="chapter-content" initial={reducedMotion || eager ? false : { opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.08 }} transition={{ duration: reducedMotion ? 0 : 0.7, ease: [0.22, 1, 0.36, 1] }}>{children}</m.div>
   </section>;
 }
