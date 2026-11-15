@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: faze-match-checker
+  group: faze-market-automation
   cancel-in-progress: false
 
 jobs:
@@ -27,9 +27,17 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Check match results (dry run only)
+      - name: Check results and apply enabled settlements
         env:
           PANDASCORE_API_TOKEN: ${{ secrets.PANDASCORE_API_TOKEN }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-        run: node scripts/settle-pandascore-markets.cjs --dry-run
+          PANDASCORE_AUDIT: 'true'
+          ENABLED: ${{ vars.PANDASCORE_SETTLEMENT_ENABLED }}
+        shell: bash
+        run: |
+          if [ "$ENABLED" = "true" ]; then
+            node scripts/settle-pandascore-markets.cjs --apply
+          else
+            node scripts/settle-pandascore-markets.cjs --dry-run
+          fi

@@ -1,0 +1,32 @@
+name: Sync FaZe Matches and Markets
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: faze-market-automation
+  cancel-in-progress: false
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Sync fixtures and prediction markets
+        env:
+          PANDASCORE_API_TOKEN: ${{ secrets.PANDASCORE_API_TOKEN }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          ENABLED: ${{ vars.PANDASCORE_SYNC_ENABLED }}
+        shell: bash
+        run: |
+          if [ "$ENABLED" = "true" ]; then
+            node scripts/sync-pandascore-markets.cjs --apply
+          else
+            node scripts/sync-pandascore-markets.cjs --dry-run
+          fi

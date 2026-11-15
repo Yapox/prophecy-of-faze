@@ -12,6 +12,8 @@
     "check:flow": "node scripts/check-flow.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "check:account": "node scripts/check-account-flow.mjs",
+    "check:database": "node scripts/check-database.mjs",
+    "check:automation": "node --test scripts/tests/settle-pandascore-markets.test.cjs scripts/tests/sync-pandascore-markets.test.cjs",
     "check:chat": "node scripts/check-oracle-chat.mjs",
     "check:cinematic": "node scripts/check-cinematic.mjs",
     "preview": "vite preview"
@@ -23,6 +25,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "^4.3.5",
     "@vitejs/plugin-react": "^4.3.4",

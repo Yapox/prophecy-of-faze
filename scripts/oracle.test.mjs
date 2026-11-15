@@ -137,3 +137,12 @@ test('Oracle permits configured CORS preflights, rejects unknown origins, and st
   assert.equal((await call(handler, { headers: { origin: 'https://yapox.github.io' } })).statusCode, 401);
   assert.equal((await call(handler, { headers: { origin: 'https://oracle.example', host: 'oracle.example' } })).statusCode, 401);
 });
+
+test('durable Oracle quota fails closed before provider requests', async () => {
+  for (const [quota, expected] of [[{ data: false, error: null }, 429], [{ data: null, error: new Error('database unavailable') }, 503]]) {
+    let calls = 0;
+    const handler = createOracleHandler({ env: { ...env, ORACLE_DURABLE_RATE_LIMIT: 'true' }, database: (...args) => ({ ...database(...args), rpc: async name => { assert.equal(name, 'reserve_oracle_request'); return quota; } }), fetchImpl: async () => { calls++; } });
+    assert.equal((await call(handler)).statusCode, expected);
+    assert.equal(calls, 0);
+  }
+});

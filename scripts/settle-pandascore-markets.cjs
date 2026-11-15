@@ -78,6 +78,9 @@ function evaluate(market, result, now = Date.now()) {
     winner_team_id: result.winner_id,
     end_at: result.end_at,
     modified_at: result.modified_at,
+    scheduled_at: result.scheduled_at,
+    begin_at: result.begin_at,
+    scores: result.results.map(row => ({ team_id: row.team_id, score: row.score })),
     rpc: { p_market_id: market.id, p_winning_side: result.winner_id === FAZE_ID ? 'YES' : 'NO' },
   };
 }
@@ -178,13 +181,13 @@ async function loadResults(ids, token, io) {
   return results;
 }
 
-async function callSettlement(plan, config, io) {
-  const url = new URL('/rest/v1/rpc/settle_prediction_market', config.origin);
+async function callSettlement(plan, config, io, audited) {
+  const url = new URL(`/rest/v1/rpc/${audited ? 'settle_pandascore_prediction' : 'settle_prediction_market'}`, config.origin);
   let response;
   try {
     response = await io.fetch(url, { method: 'POST',
       headers: { ...supabaseHeaders(config), 'Content-Type': 'application/json', 'Content-Profile': 'public' },
-      body: JSON.stringify(plan.rpc), redirect: 'error', signal: AbortSignal.timeout(30_000) });
+      body: JSON.stringify(audited ? { ...plan.rpc, p_evidence: plan } : plan.rpc), redirect: 'error', signal: AbortSignal.timeout(30_000) });
   } catch { throw new SafeError('Settlement response lost/timeout. It may have committed. Inspect this market before rerunning; never change the outcome to force a retry.'); }
   try { await response.body?.cancel(); } catch {}
   if (!response.ok) throw new SafeError(`Settlement RPC failed (HTTP ${response.status}). Stop and inspect; earlier markets may have committed. No automatic write retry.`);
@@ -221,7 +224,7 @@ async function run({ argv = process.argv.slice(2), env = process.env, fetchImpl 
     if (freshMarkets.length !== 1) throw new SafeError('Market disappeared or became ambiguous before settlement.');
     const fresh = evaluate(freshMarkets[0], freshResults.get(plan.pandascore_match_id), now());
     if (!fresh.eligible || JSON.stringify(fresh) !== JSON.stringify(plan)) throw new SafeError('Market/result changed during review; stopped before settling this market. Earlier settlements may have committed.');
-    await callSettlement(fresh, config, io);
+    await callSettlement(fresh, config, io, env.PANDASCORE_AUDIT === 'true');
     log({ action: 'settlement_rpc_succeeded', market_id: plan.market_id, side: plan.rpc.p_winning_side });
   }
   return plans;

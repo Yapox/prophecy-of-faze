@@ -65,6 +65,11 @@ export function createOracleHandler({ env = process.env, fetchImpl = fetch, data
       const client = database(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }, global: { headers: { Authorization: bearer } } });
       const { data: userData, error: userError } = await client.auth.getUser(bearer.slice(7));
       if (userError || !userData?.user) return send(401, { error: 'Your session has expired. Sign in again.' });
+      if (env.ORACLE_DURABLE_RATE_LIMIT === 'true') {
+        const { data: allowed, error: quotaError } = await client.rpc('reserve_oracle_request');
+        if (quotaError) return send(503, { error: 'The Oracle request limit service is unavailable. Try again later.' });
+        if (allowed !== true) { res.setHeader('Retry-After', '60'); return send(429, { error: 'The Oracle request limit has been reached. Please try again later.' }); }
+      }
       const minute = Math.floor(clock() / 60000);
       for (const [id, entry] of requests) if (entry.minute !== minute) requests.delete(id);
       const used = requests.get(userData.user.id);

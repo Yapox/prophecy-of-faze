@@ -69,10 +69,11 @@ function harness(options = {}) {
         return json(clone(rows.slice(start, start + 100)), { 'Content-Range': `${start}-${start + rows.length - 1}/${rows.length}` });
       }
       assert.equal(request.method, 'POST');
-      assert.equal(url.pathname, '/rest/v1/rpc/settle_prediction_market');
+      assert.equal(url.pathname, options.audited ? '/rest/v1/rpc/settle_pandascore_prediction' : '/rest/v1/rpc/settle_prediction_market');
       assert.equal(request.headers['Content-Profile'], 'public');
       const args = JSON.parse(request.body);
-      assert.deepEqual(Object.keys(args).sort(), ['p_market_id', 'p_winning_side']);
+      assert.deepEqual(Object.keys(args).sort(), options.audited ? ['p_evidence', 'p_market_id', 'p_winning_side'] : ['p_market_id', 'p_winning_side']);
+      if (options.audited) { assert.equal(args.p_evidence.market_id, args.p_market_id); assert.equal(args.p_evidence.rpc.p_winning_side, args.p_winning_side); assert.equal(args.p_evidence.scores.length, 2); }
       assert.ok(['YES', 'NO'].includes(args.p_winning_side));
       state.posts.push(args);
       if (options.rpcTimeout) throw new Error(env.SUPABASE_SECRET_KEY);
@@ -108,7 +109,7 @@ function harness(options = {}) {
     if (options.onProviderRead) options.onProviderRead(state);
     return json(clone(options.ignoreResultFilter ? state.results : state.results.filter(row => requestedIds.includes(row.id))));
   };
-  state.run = argv => run({ argv, env, fetchImpl, now: () => state.now,
+  state.run = argv => run({ argv, env: { ...env, PANDASCORE_AUDIT: options.audited ? 'true' : 'false' }, fetchImpl, now: () => state.now,
     sleepImpl: async delay => state.sleeps.push(delay), output: line => state.logs.push(line) });
   return state;
 }
@@ -120,6 +121,14 @@ test('exact external references only', () => {
 test('declared winner 3212 proposes YES; opponent winner proposes NO', () => {
   assert.equal(evaluate(market(), result(3212), NOW).rpc.p_winning_side, 'YES');
   assert.equal(evaluate(market(), result(222), NOW).rpc.p_winning_side, 'NO');
+});
+
+test('audited apply sends validated provider evidence with the payout RPC', async () => {
+  const h = harness({ audited: true });
+  await h.run(['--apply']);
+  assert.equal(h.posts.length, 1);
+  assert.equal(h.posts[0].p_evidence.external_reference, 'pandascore:match:1796528');
+  assert.equal(h.payouts.length, 1);
 });
 
 const unsafeCases = [
