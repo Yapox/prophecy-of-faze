@@ -86,7 +86,7 @@ export default function OdysseyApp() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Built for HackUTA 2026.</p></div>
-        <div className="footer-credit"><p>© 2026 <GitHubProfile name="Aashaswa Khakurel" username="Yapox" /> <span className="footer-creator-pair">&amp; Subigya Poudel.</span></p><p>All rights reserved.</p></div>
+        <div className="footer-credit"><p>© 2026 <GitHubProfile name="Aashaswa Khakurel" username="Yapox" /> <span className="footer-creator-pair">&amp; <GitHubProfile name="Subigya Poudel" username="Yapox" />.</span></p><p>All rights reserved.</p></div>
       </div>
       <div className="footer-bottom">SIMULATED COINS ONLY · NO CASH VALUE</div>
     </footer>
