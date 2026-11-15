@@ -9,6 +9,12 @@ Object.assign(globalThis, { window: dom.window, document: dom.window.document, H
 Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true });
 globalThis.BroadcastChannel = undefined;
 window.scrollTo = () => {};
+// JSDOM has no viewport observer. Scroll visibility is checked in Chromium.
+globalThis.IntersectionObserver = window.IntersectionObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 // Old saved preferences must not keep users on sample fixtures.
 window.localStorage.setItem('faze-mode', 'demo');
 Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
