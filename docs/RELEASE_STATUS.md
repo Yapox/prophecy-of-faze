@@ -11,7 +11,7 @@
 | Automated fixtures and questions | Atomic RPC, scheduler and CLI implemented | Read-only schema check confirmed the new functions/ledger are absent. Dry-run found the two real upcoming fixtures. Apply remains disabled. |
 | Automated payouts | Existing validation plus audited payout wrapper | Migration and apply control pending. Special outcomes require operator review. |
 | Oracle request limits | In-process limit and optional database-backed quota | Durable quota requires the migration and server setting. |
-| Legal pages | Updated for actual hosting, result samples, activity and operations | Operator/contact/eligibility/retention/request procedures still require actual information and review. |
+| Footer and creator credits | Copyright 2026 Aashaswa Khakurel and Subigya Poudel; built for HackUTA 2026 | Terms and Privacy pages removed at the project owner's request. |
 | Variable exchange prices | Not implemented | Existing fixed 1-coin/2-coin contract remains the backend contract. Awaiting scope decision. |
 
 ## Verified on the published site
@@ -25,4 +25,4 @@ The [live account workflow](https://github.com/Yapox/prophecy-of-faze/actions/ru
 
 Published recovery and activity UI checks passed at 320, 390 and 1440 pixels with no overflow, missing assets or browser exceptions. Actual signup/recovery email delivery and real-match settlement were not tested.
 
-The [read-only migration check](https://github.com/Yapox/prophecy-of-faze/actions/runs/43675296657) at 04:06 UTC found neither automation RPC nor the operations ledger. Scheduled sync and settlement are still dry-run. Gemini hosting/key and operator/contact details remain outstanding. See [DEPLOYMENT.md](DEPLOYMENT.md) for activation steps.
+The [read-only migration check](https://github.com/Yapox/prophecy-of-faze/actions/runs/43675296657) at 04:06 UTC found neither automation RPC nor the operations ledger. Scheduled sync and settlement are still dry-run. Gemini hosting/key remains outstanding. See [DEPLOYMENT.md](DEPLOYMENT.md) for activation steps.

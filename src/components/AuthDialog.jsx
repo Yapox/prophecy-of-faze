@@ -61,9 +61,8 @@ export default function AuthDialog({ onClose, onPractice, initialMode = 'login',
       <form onSubmit={submit}>
         <label className="field-label" htmlFor="email">Email</label><input id="email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
         <label className="field-label" htmlFor="password">Password</label><input id="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'signup' ? 8 : undefined} required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} />
-        <p className="form-note"><a href="#terms" onClick={onClose}>Draft terms</a> · <a href="#privacy" onClick={onClose}>Privacy notice</a></p>
         {message && <p className="notice" role="status">{message}</p>}
-        <button className="button button-primary w-full" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}</button>
+        <button className="button button-primary w-full auth-submit" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}</button>
       </form>
       <button className="text-link auth-switch" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); }}>{mode === 'login' ? 'New here? Create an account' : 'Already have an account? Sign in'}</button>
     </> : <><p className="muted">Account sign-in is unavailable. Try practice mode, saved on this device.</p><button className="button button-primary w-full" onClick={onPractice}>Continue in practice mode</button></>}

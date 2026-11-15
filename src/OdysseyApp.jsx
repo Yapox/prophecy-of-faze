@@ -8,11 +8,10 @@ import AuthDialog from './components/AuthDialog.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Oracle from './pages/Oracle.jsx';
-import Legal from './pages/Legal.jsx';
 import CinematicLanding from './pages/CinematicLanding.jsx';
 import { clearRecoveryLocation, recoveryRequested } from './auth.js';
 
-const pageNames = { home: 'Home', markets: 'Markets', portfolio: 'Portfolio', leaderboard: 'Leaderboard', oracle: 'The Oracle', terms: 'Terms of use', privacy: 'Privacy notice' };
+const pageNames = { home: 'Home', markets: 'Markets', portfolio: 'Portfolio', leaderboard: 'Leaderboard', oracle: 'The Oracle' };
 function currentPage() {
   const hash = typeof window === 'undefined' ? 'home' : window.location.hash.slice(1);
   return Object.hasOwn(pageNames, hash) ? hash : 'home';
@@ -74,7 +73,6 @@ export default function OdysseyApp() {
     <header className="site-header"><a className="brand" href="#home"><span className="brand-monogram" aria-hidden="true">P</span><span className="brand-name">Prophecy of FaZe</span></a><nav className="main-nav" aria-label="Main navigation">{['markets', 'portfolio', 'leaderboard', 'oracle'].map(value => <a key={value} href={`#${value}`} aria-current={page === value ? 'page' : undefined}>{pageNames[value]}</a>)}</nav><div className="header-actions">{arena.accountLoaded && <a href="#portfolio" className="wallet-pill">{formatCoins(arena.data.wallet.balance)} coins<small>{arena.mode === 'demo' ? 'Practice wallet' : 'Virtual balance'}</small></a>}{arena.authenticated ? <button className="button button-secondary button-small" disabled={arena.busy} onClick={arena.signOut}>Sign out</button> : <button className="button button-primary button-small" onClick={account}>Sign in</button>}</div></header>
     {arena.notice && <div className="notice global-notice" role="status">{arena.notice} <button className="text-link" onClick={() => arena.setNotice('')}>Dismiss</button></div>}
     <main className="main-content" id="main-content" tabIndex="-1">
-      {['terms', 'privacy'].includes(page) ? <Legal page={page} /> : <>
         {page !== 'home' && <div className="page-heading"><span className="eyebrow">{({ markets: 'Choose your next crossing', portfolio: 'Chart your odyssey', leaderboard: 'A place among the legends', oracle: 'Seek the counsel of the Oracle' })[page]}</span><h1>{({ markets: 'Every match. Your call.', portfolio: 'Your portfolio.', leaderboard: 'The leaderboard.', oracle: 'The Oracle.' })[page]}</h1><p>{({ markets: '1 virtual coin per contract. 2 back if correct.', portfolio: 'Your calls. Your coins. Your progress.', leaderboard: 'Make your call. Climb the ranks.', oracle: 'Match insight before your next move.' })[page]}</p></div>}
         <div className="mode-notice"><span>{arena.mode === 'demo' ? 'Practice mode · Sample matches · Saved on this device' : arena.authenticated ? `Account mode${arena.updatedAt ? ` · Updated ${new Date(arena.updatedAt).toLocaleTimeString()}` : ''}` : 'Explore the arena with free virtual coins.'}</span><button className="text-link" disabled={arena.busy} onClick={arena.mode === 'demo' ? account : practice}>{arena.mode === 'demo' ? 'Use account mode' : 'Try practice mode'}</button></div>
         {arena.error && <div className="notice notice-error" role="alert">{arena.error} {arena.authenticated && <button className="text-link" onClick={arena.refresh} disabled={arena.loading}>Retry refresh</button>}</div>}
@@ -83,9 +81,14 @@ export default function OdysseyApp() {
         {page === 'markets' && <section className="section markets-section"><div className="market-toolbar"><div className="filter-tabs" role="group" aria-label="Filter by game">{['All games', 'CS2', 'Valorant'].map(value => <button key={value} aria-pressed={game === value} onClick={() => setGame(value)}>{value}</button>)}</div><label className="search-field"><span className="sr-only">Search teams or events</span><input type="search" value={search} onChange={event => setSearch(event.target.value)} placeholder="Search teams or events" /></label></div><div className="status-row"><label className="checkbox-label"><input type="checkbox" checked={settled} onChange={event => setSettled(event.target.checked)} /> Include settled markets</label>{arena.authenticated && <button className="text-link" onClick={arena.refresh} disabled={arena.loading}>Refresh markets</button>}</div><p className="market-count">{visible.length} {visible.length === 1 ? 'market' : 'markets'} / {arena.sample ? 'sample fixtures' : 'account records'}</p>{loading ? <Loading /> : visible.length ? <div className="market-grid">{visible.map(market => card(market))}</div> : <Empty arena={arena} onAuth={account} search={Boolean(game !== 'All games' || search)} />}</section>}
         {['portfolio', 'leaderboard'].includes(page) && arena.authenticated && <div className="status-row"><button className="button button-secondary button-small" onClick={arena.refresh} disabled={arena.loading}>{arena.loading ? 'Refreshing…' : 'Refresh'}</button></div>}
         {loading && ['portfolio', 'leaderboard', 'oracle'].includes(page) ? <Loading /> : <>{page === 'portfolio' && <Portfolio arena={arena} onAuth={() => setAuth(true)} />}{page === 'leaderboard' && <Leaderboard arena={arena} now={now} onAuth={() => setAuth(true)} />}{page === 'oracle' && <Oracle arena={arena} selectedMarket={oracleMarket} onSelect={setOracleMarket} onAuth={account} />}</>}
-      </>}
     </main>
-    <footer className="site-footer"><div className="footer-inner"><div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Unofficial HackUTA 2026 prototype. Not endorsed by FaZe Clan.</p></div><nav className="footer-links" aria-label="Legal"><a href="#terms">Terms of use</a><a href="#privacy">Privacy notice</a></nav></div><div className="footer-bottom">SIMULATED COINS ONLY · NO CASH VALUE</div></footer>
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Built for HackUTA 2026. Unofficial and not endorsed by FaZe Clan.</p></div>
+        <div className="footer-credit"><p>© 2026 Aashaswa Khakurel &amp; Subigya Poudel.</p><p>All rights reserved.</p></div>
+      </div>
+      <div className="footer-bottom">SIMULATED COINS ONLY · NO CASH VALUE</div>
+    </footer>
     {trade && selected && arena.accountLoaded && <TradeDialog key={`${arena.mode}:${selected.id}`} market={selected} match={matches.get(selected.match_id)} initialSide={trade.side} initialQuantity={trade.quantity} arena={arena} now={now} onClose={() => setTrade(null)} onPortfolio={() => { setTrade(null); window.location.hash = 'portfolio'; }} />}
     {auth && <AuthDialog key={arena.recovering ? 'recovery' : 'auth'} initialMode={arena.recovering ? 'recovery' : recoveryRequested() ? 'forgot' : 'login'} onClose={() => { setAuth(false); arena.finishRecovery(); clearRecoveryLocation(); }} onPractice={practice} onRecoveryComplete={() => { arena.finishRecovery(); clearRecoveryLocation(); arena.setNotice('Your password has been updated. You are signed in to your account.'); setAuth(false); }} />}
   </>;

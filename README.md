@@ -25,7 +25,7 @@ The active application is `src/OdysseyApp.jsx`, using React, Vite, and Tailwind 
 
 Motion for React is the only animation library. Each chapter links opacity and a small vertical offset to its scroll position. Artwork peaks at 17% opacity, sits behind content, and cannot intercept clicks. Small screens use smaller WebP assets and 40% of the desktop parallax distance. Reduced-motion preference mounts static artwork with no scroll-animation subscription. Poseidon's ocean lines move with scrolling, with no looping ambient animation. See [artwork and verification notes](docs/CINEMATIC_LANDING.md).
 
-The navigation includes Home, Markets, Portfolio, Leaderboard, The Oracle, and draft Terms and Privacy pages. Markets support game filters, search, YES/NO selection, whole-number contract quantities, a cost/return preview, confirmation, and pending-request retries. The existing backend uses fixed payouts: one contract costs one virtual coin and returns two if correct. These are not variable exchange prices or predicted probabilities.
+The navigation includes Home, Markets, Portfolio, Leaderboard, and The Oracle. Markets support game filters, search, YES/NO selection, whole-number contract quantities, a cost/return preview, confirmation, and pending-request retries. The existing backend uses fixed payouts: one contract costs one virtual coin and returns two if correct. These are not variable exchange prices or predicted probabilities.
 
 Practice mode stores seeded fixtures, positions, ledger entries, and a 1,000-coin starting wallet in this browser’s local storage. Practice and account data are separate. Portfolio includes tools to resolve or cancel sample fixtures and reset the practice wallet. Sample schedules, teams’ participation, and event names do not claim to represent real fixtures. Leaderboard practice mode contains only the current practice user.
 
@@ -49,17 +49,17 @@ Implementation references: [Tailwind’s Vite integration](https://tailwindcss.c
 
 - `npm test`: trade calculations, retries, settlement/refunds, ledger reconciliation, storage fallback, and Oracle authorization/data minimization with a mocked provider.
 - `npm run check:render`: the app and representative market card render through Vite.
-- `npm run check:flow`: a DOM-based practice journey covering a duplicate confirm click, wallet debit, portfolio, winning settlement, transaction history, leaderboard, game filtering, and legal navigation.
+- `npm run check:flow`: a DOM-based practice journey covering a duplicate confirm click, wallet debit, portfolio, winning settlement, transaction history, leaderboard, game filtering, and fallback from removed routes.
 - `npm run check:account`: controlled Supabase responses covering sign-in gating, automatic refresh, newly imported cards, purchases/retries, wallet updates, resolved positions, and logout cleanup. This does not read or modify deployed records.
 - `npm run check:chat`: React chat through the real client helper and server handler with controlled Gemini/Supabase responses, including follow-ups, errors/retries, duplicate submits, clearing, and stale replies after changing matches.
-- `npm run check:cinematic`: real headless Chromium checks for desktop/mobile layouts, four scroll-linked figures, responsive image loading, reduced motion, keyboard focus, action contrast, calculator-to-confirmation trading, and portfolio/leaderboard/legal navigation. Run `npx playwright install chromium --only-shell` once if the test browser is missing, and start the local Vite server first.
+- `npm run check:cinematic`: real headless Chromium checks for desktop/mobile layouts, four scroll-linked figures, responsive image loading, reduced motion, keyboard focus, action contrast, calculator-to-confirmation trading, portfolio/leaderboard navigation, and creator credits. Run `npx playwright install chromium --only-shell` once if the test browser is missing, and start the local Vite server first.
 - `npm run build`: production compilation.
 
 Live account integration passed against the published Pages site and Supabase: the signup trigger granted 1,000 coins, both FaZe questions displayed, YES/NO purchases updated the wallet, duplicate retries did not debit twice, and history, leaderboard, session persistence and logout worked. The temporary admin-confirmed account was deleted afterward. Actual signup/recovery email delivery and live-match payouts remain unverified. See [release status and the sanitized report](docs/RELEASE_STATUS.md).
 
 The cinematic landing page has been inspected in headless Chromium at desktop and mobile widths, with overflow checks at 320, 390, 768, and 1440 pixels, reduced-motion checks, keyboard skip-link checks, and a completed browser-local practice trade. Published recovery/activity checks also passed at 320, 390 and 1440 pixels. Screenshots and browser reports are saved under ignored `artifacts/`.
 
-The Terms and Privacy pages are drafts. Operator/contact details, eligibility, jurisdiction, retention, and account deletion/export processes still need review.
+The footer credits Aashaswa Khakurel and Subigya Poudel for the HackUTA 2026 project. Terms and Privacy pages were removed at the project owner's request; old hashes fall back to Home.
 
 ## Completion updates
 

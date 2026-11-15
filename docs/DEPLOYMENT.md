@@ -15,8 +15,6 @@ Repository Actions variables:
 | `VITE_SUPABASE_URL` | Public Supabase project URL. Already configured. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Public client key. Already configured. |
 | `VITE_ORACLE_URL` | Optional HTTPS Oracle endpoint, e.g. the actual Vercel domain followed by `/api/oracle`. |
-| `VITE_OPERATOR_NAME` | Actual project operator, once confirmed. |
-| `VITE_SUPPORT_EMAIL` | Actual monitored support email, once confirmed. |
 
 Variable changes require a new Pages build. Do not put private keys in any `VITE_` variable.
 
@@ -110,6 +108,6 @@ The manually dispatched `Test Deployed Account Integration` workflow can indepen
 
 Select the workflow's `readiness_only` input to inspect the deployed service-role OpenAPI schema without creating an account or writing data. The JSON `ready` field reports whether both automation RPCs and the operations ledger are exposed. A completed check with `ready: false` means the check ran successfully but deployment is still incomplete. OpenAPI discovery is permission-sensitive, as described by [PostgREST](https://docs.postgrest.org/en/stable/references/api/openapi.html); a missing or unexpected schema is reported as unknown/failure, never ready. On 2026-11-15 at 04:06 UTC, the new objects were absent.
 
-Operator identity, monitored support contact, eligibility/jurisdiction, formal retention, and deletion/export procedures remain draft decisions. The UI explicitly identifies missing details and does not invent commitments.
+The footer credits Aashaswa Khakurel and Subigya Poudel for HackUTA 2026. The Terms and Privacy pages and their configuration variables have been removed at the project owner's request.
 
 References: [Supabase recovery](https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail), [redirect allowlists](https://supabase.com/docs/guides/auth/redirect-urls), [Vercel Node functions](https://vercel.com/docs/functions/runtimes/node-js), [PandaScore plan coverage](https://developers.pandascore.co/docs/plan-reference).

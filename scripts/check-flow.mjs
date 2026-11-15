@@ -8,6 +8,12 @@ Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, co
 // Node's BroadcastChannel would keep this DOM-only test process alive.
 globalThis.BroadcastChannel = undefined;
 window.scrollTo = () => {};
+// JSDOM has no viewport observer. Scroll visibility is checked in Chromium.
+globalThis.IntersectionObserver = window.IntersectionObserver = class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};
 window.localStorage.setItem('faze-mode', 'demo');
 window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
 window.HTMLDialogElement.prototype.close = function () { this.open = false; };
@@ -57,10 +63,11 @@ try {
   await click([...document.querySelectorAll('.filter-tabs button')].find(button => button.textContent === 'Valorant'));
   assert.equal(document.querySelectorAll('.market-card').length, 2);
   await navigate('terms');
-  assert.match(document.body.textContent, /DRAFT FOR REVIEW/);
+  assert.match(document.querySelector('h1').textContent, /Predict the Game/);
   await navigate('privacy');
-  assert.match(document.body.textContent, /Data stored in your browser/);
-  console.log('PASS: DOM flow covers landing, YES purchase, wallet debit, portfolio, simulated settlement, transactions, leaderboard, filters, and legal navigation.');
+  assert.match(document.querySelector('h1').textContent, /Predict the Game/);
+  assert.equal(document.querySelectorAll('a[href="#terms"], a[href="#privacy"]').length, 0);
+  console.log('PASS: DOM flow covers landing, YES purchase, wallet debit, portfolio, simulated settlement, transactions, leaderboard, filters, and removed-route fallback.');
   console.log('This is a DOM test, not a desktop/mobile visual browser inspection.');
 } finally {
   await act(async () => root.unmount());

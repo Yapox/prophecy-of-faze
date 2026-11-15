@@ -136,10 +136,8 @@ try {
   await page.locator('.main-nav').getByRole('link', { name: 'Leaderboard', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'The leaderboard.' })).toBeVisible();
   await noOverflow(page, 'mobile leaderboard');
-  await page.locator('footer').getByRole('link', { name: 'Terms of use' }).click();
-  await expect(page.getByText('DRAFT FOR REVIEW / HACKATHON PROTOTYPE')).toBeVisible();
-  await page.locator('footer').getByRole('link', { name: 'Privacy notice' }).click();
-  await expect(page.getByRole('heading', { name: 'Privacy notice' })).toBeVisible();
+  await expect(page.locator('footer')).toContainText('© 2026 Aashaswa Khakurel & Subigya Poudel.');
+  await expect(page.locator('a[href="#terms"], a[href="#privacy"]')).toHaveCount(0);
 
   const reduced = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   reduced.on('pageerror', error => errors.push(error.message));
@@ -166,7 +164,7 @@ try {
   assert.deepEqual(errors, [], 'No browser JavaScript errors');
   results.errors = errors;
   await writeFile(`${output}/report.json`, JSON.stringify(results, null, 2));
-  console.log('PASS: real Chromium desktop/mobile layout, four artwork stages, scroll fade/parallax, responsive image loading, reduced motion, keyboard skip link, action contrast, calculator purchase, wallet/portfolio, filters, leaderboard, and legal links.');
+  console.log('PASS: real Chromium desktop/mobile layout, four artwork stages, scroll fade/parallax, responsive image loading, reduced motion, keyboard skip link, action contrast, calculator purchase, wallet/portfolio, filters, leaderboard, and creator credits.');
   console.log(`Screenshots and report: ${output}/. Practice wallet only; no live account trades or settlement.`);
 } finally {
   await browser.close();

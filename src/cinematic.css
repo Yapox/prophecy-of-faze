@@ -181,6 +181,12 @@ th { background: #1c1e1d; }
 }
 .auth-recovery-link { display: block; margin-top: 16px; }
 .auth-recovery-form > .button-primary { margin-top: 18px; }
+.auth-submit { margin-top: 20px; }
+.footer-credit { align-self: center; text-align: right; }
+.footer-credit p:first-child { color: var(--color-ink); font-size: .75rem; }
+@media (max-width: 780px) {
+  .footer-credit { text-align: left; }
+}
 .activity-section { margin-top: 64px; }
 .activity-rules { font-size: .75rem; color: var(--muted); max-width: 620px; }
 .activity-rules summary { cursor: pointer; width: fit-content; color: var(--accent); padding: 8px 0; }
