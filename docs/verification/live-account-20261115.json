@@ -1,0 +1,69 @@
+{
+  "timestamp": "2026-11-15T04:01:30.548Z",
+  "site": "https://yapox.github.io/prophecy-of-faze/",
+  "account": "Temporary admin-confirmed QA account",
+  "emailConfirmation": "Not tested: admin confirmation does not verify signup email delivery",
+  "purchases": [
+    {
+      "question": "Will FaZe Clan beat fnatic?",
+      "side": "YES",
+      "stake": 5,
+      "balanceAfter": 995,
+      "duplicateRetry": "No second debit"
+    },
+    {
+      "question": "Will FaZe Clan beat Wildcard?",
+      "side": "NO",
+      "stake": 5,
+      "balanceAfter": 990,
+      "duplicateRetry": "No second debit"
+    }
+  ],
+  "cleanup": "Temporary QA account deleted; its wallet, positions and ledger rows cascade deleted",
+  "signupWallet": "1000 coins, exactly one signup bonus",
+  "requestedMatches": [
+    {
+      "reference": "pandascore:match:1796528",
+      "found": true,
+      "linkedQuestions": [
+        "Will FaZe Clan beat fnatic?"
+      ],
+      "browserDisplay": "Questions displayed"
+    },
+    {
+      "reference": "pandascore:match:1789256",
+      "found": true,
+      "linkedQuestions": [
+        "Will FaZe Clan beat Wildcard?"
+      ],
+      "browserDisplay": "Questions displayed"
+    }
+  ],
+  "providerResults": {
+    "available": true,
+    "inspected": 200,
+    "teams": [
+      {
+        "name": "FaZe Clan",
+        "results": 0,
+        "wins": 0
+      },
+      {
+        "name": "fnatic",
+        "results": 0,
+        "wins": 0
+      }
+    ]
+  },
+  "sessionPersistence": "Browser reload preserves authenticated account and balance",
+  "leaderboard": {
+    "loaded": true,
+    "entries": 5,
+    "qaUserIncluded": true
+  },
+  "logout": "Private wallet cleared",
+  "livePayout": "Not tested: no real match outcome was altered",
+  "result": "Completed available deployed-account checks",
+  "workflow": "https://github.com/Yapox/prophecy-of-faze/actions/runs/43674884186",
+  "testedCommit": "2545d858924de1f7264635317983b7ced2c4562c"
+}

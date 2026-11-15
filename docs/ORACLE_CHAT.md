@@ -26,7 +26,7 @@ The app does not attach email, wallet, position history, or session credentials 
 
 Only complete prior turns are included, up to three, with 1,000 characters per user message and 4,000 per model response. Request bodies are capped at 64 KiB. The server ignores client-supplied model/context configuration. It re-reads the match on every question and requests concise plain-text replies. Rendered replies do not execute HTML or trigger purchases, wallet updates, or settlement.
 
-The server uses five requests per user per minute per process. This is an MVP limit, not a distributed quota. Provider limits may also apply. The server times out Gemini requests after 20 seconds and the client after 25 seconds. Errors restore the question in the composer for a deliberate retry. Cancelling a browser request may not stop already-started server/provider work, but stale responses cannot appear in a different conversation.
+The server uses five requests per user per minute per process. Enabling the optional database reservation adds shared limits across instances after the migration is applied. Provider limits may also apply. The server times out Gemini requests after 20 seconds and the client after 40 seconds, allowing time for provider context reads. Errors restore the question in the composer for a deliberate retry. Cancelling a browser request may not stop already-started server/provider work, but stale responses cannot appear in a different conversation.
 
 ## Verification
 
@@ -34,4 +34,4 @@ The server uses five requests per user per minute per process. This is an MVP li
 - `npm run check:chat`: the actual React chat, API helper, and endpoint with controlled provider/database responses. Covers sign-in, suggestions, follow-ups, duplicate protection, failed-question retry, New chat, changing markets during a request, stale-response rejection, and practice/logout behavior.
 - `npm run build`: production frontend compilation.
 
-These checks make no live Gemini requests or Supabase changes. At implementation time, the local Gemini key was not configured and browser automation was unavailable. A real signed-in provider response and desktop/mobile visual inspection remain pending.
+These controlled checks make no live Gemini requests or Supabase changes. The published frontend has since been inspected in headless Chromium, and live account integration passed separately. A live PandaScore read also succeeded, although the bounded 200-fixture sample contained no qualifying FaZe/fnatic results. The Oracle endpoint/key remains unconfigured, so an actual signed-in Gemini reply is still unverified. See [release status](RELEASE_STATUS.md).
