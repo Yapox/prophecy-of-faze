@@ -12,17 +12,21 @@
     "check:auth": "node scripts/check-auth.mjs",
     "check:account": "node scripts/check-account-flow.mjs",
     "check:chat": "node scripts/check-oracle-chat.mjs",
+    "check:cinematic": "node scripts/check-cinematic.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.57.0",
+    "motion": "^14.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/vite": "^4.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^26.1.0",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4.3.5",
     "vite": "^6.0.0"
   },

@@ -31,8 +31,8 @@ try {
   // Configured projects open account mode. Practice is an explicit action.
   const practiceButton = [...document.querySelectorAll('button')].find(button => button.textContent === 'Try practice mode');
   if (practiceButton) await click(practiceButton);
-  assert.equal(document.querySelectorAll('.hero .market-card').length, 1);
-  await click(document.querySelector('.hero .yes-button'));
+  assert.equal(document.querySelectorAll('.cinematic-hero .market-card').length, 1);
+  await click(document.querySelector('.cinematic-hero .yes-button'));
   assert.equal(document.querySelector('dialog').open, true);
   assert.match(document.querySelector('dialog').textContent, /Return if correct200 coins/);
   const confirmButton = document.querySelector('dialog button[type="submit"], dialog form .button-primary');

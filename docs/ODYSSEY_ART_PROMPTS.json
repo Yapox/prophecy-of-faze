@@ -1,0 +1,22 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": true,
+  "prompts": [
+    {
+      "name": "odysseus",
+      "prompt": "Use case: stylized-concept. Asset type: realistic marble-statue-inspired transparent cutout for the Prophecy of FaZe esports website. Photoreal museum sculpture photography, weathered ivory marble with fine chisel marks, gentle antique-gold edge light, deep sculptural shadows, elegant and cinematic. Truly transparent background and clean alpha edges, not a black or white backdrop and not a checkerboard drawing. Render the sculpture at full opacity; the website will fade it to 10–20%. One isolated subject, no text, logos, watermark, frame, scenery, or painted illustration. Modest classical drapery. Keep the silhouette and attributes inside the image with breathing room. Odysseus, mature bearded Greek voyager wearing a draped cloak and an ancient Greek pilos cap, holding a bow low across his body. Three-quarter statue from head to knees, composed tall, turned slightly toward the left with a thoughtful determined expression. The bow and cloak should identify the wandering hero. No helmet, modern clothing, extra limbs, or other figures."
+    },
+    {
+      "name": "athena",
+      "prompt": "Use case: stylized-concept. Asset type: realistic marble-statue-inspired transparent cutout for the Prophecy of FaZe esports website. Photoreal museum sculpture photography, weathered ivory marble with fine chisel marks, gentle antique-gold edge light, deep sculptural shadows, elegant and cinematic. Truly transparent background and clean alpha edges, not a black or white backdrop and not a checkerboard drawing. Render the sculpture at full opacity; the website will fade it to 10–20%. One isolated subject, no text, logos, watermark, frame, scenery, or painted illustration. Modest classical drapery. Keep the silhouette and attributes inside the image with breathing room. Athena, ancient Greek goddess of wisdom, a dignified draped standing marble statue from head to knees with a Corinthian helmet pushed up to reveal her face, a round shield by her side and an upright spear. Three-quarter pose turned gently toward the right. Calm wise expression. Tall isolated silhouette, no other figures."
+    },
+    {
+      "name": "poseidon",
+      "prompt": "Use case: stylized-concept. Asset type: realistic marble-statue-inspired transparent cutout for the Prophecy of FaZe esports website. Photoreal museum sculpture photography, weathered ivory marble with fine chisel marks, gentle antique-gold edge light, deep sculptural shadows, elegant and cinematic. Truly transparent background and clean alpha edges, not a black or white backdrop and not a checkerboard drawing. Render the sculpture at full opacity; the website will fade it to 10–20%. One isolated subject, no text, logos, watermark, frame, scenery, or painted illustration. Modest classical drapery. Keep the silhouette and attributes inside the image with breathing room. Poseidon, ancient Greek sea god, a powerful older bearded marble statue holding an unmistakable tall three-pronged trident, draped across the waist and lower body. Three-quarter statue from head to knees, stern but calm expression, turned slightly left. Classical sculpted wavy hair and beard. No ocean or water in the asset, no other figures."
+    },
+    {
+      "name": "ithaca",
+      "prompt": "Use case: stylized-concept. Asset type: realistic marble-statue-inspired transparent cutout for the Prophecy of FaZe esports website. Photoreal museum sculpture photography, weathered ivory marble with fine chisel marks, gentle antique-gold edge light, deep sculptural shadows, elegant and cinematic. Truly transparent background and clean alpha edges, not a black or white backdrop and not a checkerboard drawing. Render the sculpture at full opacity; the website will fade it to 10–20%. One isolated subject, no text, logos, watermark, frame, scenery, or painted illustration. Modest classical drapery. Keep the silhouette and attributes inside the image with breathing room. Ancient Ithaca imagined as a single coherent marble architectural relief sculpture: a low rocky island base with a small ancient Greek coastal settlement, a prominent columned Greek temple and stone terraces. Wide landscape composition, three-quarter architectural perspective, realistic carved marble, no people, no ocean, no sky or rectangular backdrop. All architecture and island contours isolated on genuine transparency."
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # Frontend verification for PandaScore matches
 
-The frontend branch includes GitHub main through `b4d38bc`, including Subigya's PandaScore importer, market setup, and settlement preparation. His message reports two matches and markets in the deployed database. Their live contents have not yet been independently verified by this frontend session.
+The frontend branch includes GitHub main through `3eaf40e`, including Subigya's PandaScore importer, market setup, settlement preparation, and scheduled result-check workflow. That workflow uses dry-run mode; it does not apply settlements. His message reports two matches and markets in the deployed database. Their live contents have not yet been independently verified by this frontend session.
 
 ## Checks completed
 
@@ -39,4 +39,4 @@ Use an email-confirmed test account in account mode at the local preview. Verify
 4. A pending-request retry, if offered, confirms the same purchase without a new debit. A new purchase intent is a separate trade.
 5. Reloading preserves the account session and backend balance. Leaderboard score includes unsettled stakes.
 
-Account settlement remains a trusted-backend action. Coordinate any payout check with Subigya; do not resolve or alter real markets from the browser. Desktop/mobile visual inspection and live signed-in requests are still pending because browser automation and an authenticated test session are unavailable here.
+Account settlement remains a trusted-backend action. Coordinate any payout check with Subigya; do not resolve or alter real markets from the browser. The cinematic landing update has since added real headless Chromium desktop/mobile inspection and practice-purchase testing, documented in `CINEMATIC_LANDING.md`. Authenticated deployed-data requests remain pending because an email-confirmed test session is unavailable here.

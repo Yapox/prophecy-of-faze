@@ -2,9 +2,9 @@ import { useRef, useState } from 'react';
 import { formatCoins, marketIsOpen, tradePreview } from '../domain.js';
 import Dialog from './Dialog.jsx';
 
-export default function TradeDialog({ market, match, initialSide, arena, onClose, onPortfolio, now }) {
+export default function TradeDialog({ market, match, initialSide, initialQuantity = 100, arena, onClose, onPortfolio, now }) {
   const [side, setSide] = useState(arena.pending?.args.p_side || initialSide || 'YES');
-  const [quantity, setQuantity] = useState(String(arena.pending?.args.p_stake || 100));
+  const [quantity, setQuantity] = useState(String(arena.pending?.args.p_stake || initialQuantity));
   const [confirmed, setConfirmed] = useState(false);
   const [validation, setValidation] = useState('');
   const submitting = useRef(false);

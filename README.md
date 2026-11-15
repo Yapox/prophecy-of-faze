@@ -17,7 +17,9 @@ See the [frontend integration contract](https://github.com/Yapox/prophecy-of-faz
 
 ## Odyssey frontend
 
-The active application is `src/OdysseyApp.jsx`, using React, Vite, and Tailwind CSS. The interface uses warm ivory, restrained gold, serif display headings, and imagery inspired by Odysseus’s voyage to Ithaca. `src/App.jsx` remains a compatibility export.
+The active application is `src/OdysseyApp.jsx`, using React, Vite, and Tailwind CSS. The interface uses obsidian black, antique gold, subtle crimson, and serif display headings. The landing page follows Odysseus, Athena, Poseidon, and Ithaca across four scroll-linked chapters with transparent marble-inspired artwork. `src/cinematic.css` supplies the dark palette and responsive layouts. `src/App.jsx` remains a compatibility export.
+
+Motion for React is the only animation library. Each chapter links opacity and a small vertical offset to its scroll position. Artwork peaks at 17% opacity, sits behind content, and cannot intercept clicks. Small screens use smaller WebP assets and 40% of the desktop parallax distance. Reduced-motion preference mounts static artwork with no scroll-animation subscription. Poseidon's ocean lines move with scrolling, with no looping ambient animation. See [artwork and verification notes](docs/CINEMATIC_LANDING.md).
 
 The navigation includes Home, Markets, Portfolio, Leaderboard, The Oracle, and draft Terms and Privacy pages. Markets support game filters, search, YES/NO selection, whole-number contract quantities, a cost/return preview, confirmation, and pending-request retries. The existing backend uses fixed payouts: one contract costs one virtual coin and returns two if correct. These are not variable exchange prices or predicted probabilities.
 
@@ -46,8 +48,9 @@ Implementation references: [Tailwind’s Vite integration](https://tailwindcss.c
 - `npm run check:flow`: a DOM-based practice journey covering a duplicate confirm click, wallet debit, portfolio, winning settlement, transaction history, leaderboard, game filtering, and legal navigation.
 - `npm run check:account`: controlled Supabase responses covering sign-in gating, automatic refresh, newly imported cards, purchases/retries, wallet updates, resolved positions, and logout cleanup. This does not read or modify deployed records.
 - `npm run check:chat`: React chat through the real client helper and server handler with controlled Gemini/Supabase responses, including follow-ups, errors/retries, duplicate submits, clearing, and stale replies after changing matches.
+- `npm run check:cinematic`: real headless Chromium checks for desktop/mobile layouts, four scroll-linked figures, responsive image loading, reduced motion, keyboard focus, action contrast, calculator-to-confirmation trading, and portfolio/leaderboard/legal navigation. Run `npx playwright install chromium --only-shell` once if the test browser is missing, and start the local Vite server first.
 - `npm run build`: production compilation.
 
-The public Supabase key was accepted by the deployed Auth settings endpoint. Signed-in signup/purchase/payout checks still require an email-confirmed test account. Desktop/mobile screenshots, visual overflow checks, and keyboard interaction in a real browser have not been completed because browser automation is unavailable. DOM tests do not substitute for that visual inspection.
+The public Supabase key was accepted by the deployed Auth settings endpoint. Signed-in signup/purchase/payout checks still require an email-confirmed test account. The cinematic landing page has been inspected in headless Chromium at desktop and mobile widths, with overflow checks at 320, 390, 768, and 1440 pixels, reduced-motion checks, keyboard skip-link checks, and a completed browser-local practice trade. These checks do not verify live account purchases or settlement. Screenshots and the browser report are saved under ignored `artifacts/cinematic/`.
 
 The Terms and Privacy pages are drafts. Operator/contact details, eligibility, jurisdiction, retention, and account deletion/export processes still need review.

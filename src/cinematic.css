@@ -1,0 +1,157 @@
+/* Shared obsidian palette. Solid surfaces preserve contrast above the artwork. */
+:root {
+  color-scheme: dark;
+  --color-parchment: #0c0d0e;
+  --color-ink: #f0ebdf;
+  --color-gold: #c6a66c;
+  --paper: #151719;
+  --border: #34332e;
+  --muted: #aaa79e;
+  --accent: #c6a66c;
+  --crimson: #c47775;
+}
+body { background: var(--color-parchment); }
+::selection { color: #0c0d0e; background: #c6a66c; }
+input, select { border-color: #666356; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline-color: #e2c58f; }
+.button-primary { background: var(--accent); border-color: var(--accent); color: #111213; }
+.button-primary:hover:not(:disabled) { background: #ddbe87; }
+.button-secondary { border-color: #696150; background: #111315; color: var(--color-ink); }
+.button-secondary:hover:not(:disabled) { background: #24221c; }
+.button-gold { background: var(--accent); color: #111213; }
+.icon-button { color: var(--color-ink); }
+.skip-link { background: var(--accent); color: #111213; }
+.skip-link:not(:focus) { clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; white-space: nowrap; padding: 0; }
+.utility-bar { background: #0a0b0c; }
+.site-header { position: relative; z-index: 2; }
+.brand-monogram { border-color: #806b44; }
+.mode-notice { color: #c0baab; background: #141614; }
+.featured-market { box-shadow: none; }
+.hero-product:before { border-color: #67573a; }
+.team-seal { background: #202320; border-color: #54554b; color: #e2ddcc; }
+.team-seal.faze-seal { background: #28191a; border-color: #694044; color: #e0a09b; }
+.contract-button { color: #d3dfc6; background: #222c22; border-color: #53604b; }
+.contract-button.no-button { color: #e8c9c3; background: #302121; border-color: #74514b; }
+.versus { color: var(--muted); }
+.dialog { border-color: #6b604b; box-shadow: 0 24px 80px #0008; }
+.dialog::backdrop { background: #030405df; }
+.outcome-toggle button.active { background: var(--accent); border-color: var(--accent); color: #111213; }
+.notice { color: #dcc9a5; background: #28231a; border-color: #665538; }
+.notice-error { color: #efb2ab; background: #2d1d1c; border-color: #744b45; }
+.pending-banner { background: #28231a; border-color: #77613e; }
+th { background: #1c1e1d; }
+.side-tag { background: #222c22; border-color: #53604b; color: #d3dfc6; }
+.side-tag.no { background: #302121; border-color: #74514b; color: #e8c9c3; }
+.positive { color: #bacda9; }
+.negative { color: #e1a69c; }
+.progression-strip, .current-user { background: #20221d; }
+.draft-label { color: #e1c68f; background: #28231a; border-color: #77613e; }
+.skeleton-line { background: #353732; }
+.skeleton-block { background: #242723; }
+.oracle-message-user { background: #23251f; }
+.oracle-composer textarea { border-color: #666356; }
+.cinematic-landing { isolation: isolate; }
+.odyssey-chapter { position: relative; isolation: isolate; overflow: clip; border-bottom: 1px solid var(--border); }
+.chapter-content { position: relative; z-index: 1; }
+.odyssey-art { position: absolute; pointer-events: none; user-select: none; z-index: 0; opacity: .14; transform: translate3d(0, var(--odyssey-shift, 0px), 0); will-change: transform, opacity; }
+.odyssey-art picture, .odyssey-art img { display: block; width: 100%; height: 100%; }
+.odyssey-art img { object-fit: contain; object-position: center; }
+.odyssey-art-static { opacity: .13; transform: none; will-change: auto; }
+.odyssey-wave-layer { pointer-events: none; position: absolute; bottom: 0; left: -30px; right: -30px; z-index: 0; transform: translate3d(var(--wave-shift, 0px), 0, 0); }
+.odyssey-waves { display: block; width: 100%; height: 130px; color: var(--accent); }
+.chapter-index { display: block; font-size: .64rem; text-transform: uppercase; letter-spacing: .17em; color: var(--muted); margin-bottom: 36px; }
+.cinematic-hero > .chapter-content { min-height: min(790px, calc(100svh - 155px)); display: grid; grid-template-columns: 1.1fr 1fr; gap: 50px 70px; align-items: center; padding: 65px 0 28px; }
+.chapter-odysseus .odyssey-art { width: min(58vw, 760px); height: 110%; right: 12%; top: -6%; }
+.cinematic-hero h1 { font-size: clamp(4rem, 6vw, 6.6rem); line-height: 1.02; letter-spacing: -.045em; }
+.cinematic-hero h1 em { color: var(--accent); font-weight: 400; }
+.cinematic-hero .hero-copy > p { max-width: 420px; font-size: .9rem; line-height: 1.85; }
+.cinematic-hero .hero-copy > .hero-footnote { margin-top: 20px; font-size: .65rem; line-height: 1.7; }
+.cinematic-hero .hero-product { align-self: center; }
+.cinematic-hero .product-caption { background: var(--color-parchment); }
+.voyage-marker { grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: .61rem; letter-spacing: .1em; text-transform: uppercase; padding-top: 28px; }
+.landing-markets > .chapter-content { padding: 90px 0 80px; }
+.chapter-athena .odyssey-art { width: 440px; height: 750px; left: -5%; top: 140px; }
+.chapter-athena .odyssey-art img { object-position: top center; }
+.chapter-heading { display: grid; grid-template-columns: 1.2fr 1fr; align-items: end; gap: 65px; margin-bottom: 42px; }
+.chapter-heading h2, .crossing-copy h2, .destination-copy h2 { font-size: clamp(3rem, 5.5vw, 5rem); line-height: 1.05; margin: 14px 0 0; }
+.chapter-heading h2 em, .crossing-copy h2 em, .destination-copy h2 em { font-weight: 400; color: var(--accent); }
+.chapter-heading p, .crossing-copy > p, .destination-copy > p { color: var(--muted); font-size: .85rem; line-height: 1.85; max-width: 375px; }
+.chapter-heading p { margin-bottom: 18px; }
+.landing-markets .market-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; width: calc(100% - 210px); margin-left: 210px; }
+.landing-markets .market-card { padding: 28px; }
+.landing-markets .market-card h3 { font-size: 1.85rem; }
+.landing-trading > .chapter-content { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 100px; padding: 100px 0 110px; }
+.chapter-poseidon .odyssey-art { left: -8%; top: 1%; height: 96%; width: 52%; }
+.crossing-copy > p { margin: 26px 0; }
+.crossing-steps { list-style: none; padding: 0; margin: 26px 0; }
+.crossing-steps li { display: flex; gap: 20px; padding: 18px 0; border-top: 1px solid var(--border); }
+.crossing-steps li > span { color: var(--accent); font: 1.4rem var(--display); width: 22px; flex-shrink: 0; }
+.crossing-steps h3 { font-size: .83rem; margin: 3px 0 7px; }
+.crossing-steps p { color: var(--muted); font-size: .76rem; max-width: 300px; margin: 0; }
+.landing-trade-panel { min-width: 0; border: 1px solid #67573a; background: var(--paper); padding: 30px; }
+.trade-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+.trade-panel-heading > span:last-child { font-size: .61rem; color: var(--muted); }
+.landing-trade-panel select, .landing-trade-panel input { width: 100%; min-width: 0; font-size: .78rem; }
+.landing-trade-panel fieldset { margin-top: 25px; }
+.calculator-context { font-size: .85rem; color: var(--muted); margin: 22px 0; }
+.calculator-footnote { text-align: center; color: var(--muted); font-size: .62rem; line-height: 1.7; margin: 14px 0 0; }
+.landing-destination > .chapter-content { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 45px 75px; padding: 95px 0 40px; min-height: 700px; }
+.chapter-ithaca .odyssey-art { width: 100%; height: 78%; bottom: 0; right: -4%; }
+.destination-copy > p { margin: 25px 0; }
+.landing-leaderboard, .leaderboard-invitation { padding: 26px; background: var(--paper); border: 1px solid var(--border); min-width: 0; }
+.landing-leaderboard .table-scroll { border-left: 0; border-right: 0; margin-top: 18px; }
+.landing-leaderboard th, .landing-leaderboard td { padding: 15px 10px; }
+.landing-leaderboard .numeric { font-size: .74rem; }
+.leaderboard-invitation h3 { font: 2rem var(--display); margin: 18px 0; }
+.leaderboard-invitation p { color: var(--muted); font-size: .82rem; margin-bottom: 22px; }
+.destination-note { grid-column: 1 / -1; padding-top: 70px; margin: 0; max-width: 530px; color: var(--muted); font-size: .64rem; }
+.chapter-content > * { min-width: 0; }
+@media (max-width: 1050px) {
+  .cinematic-hero > .chapter-content { gap: 35px; }
+  .cinematic-hero h1 { font-size: 4.4rem; }
+  .landing-trading > .chapter-content { gap: 50px; }
+  .landing-destination > .chapter-content { gap: 45px; }
+}
+@media (max-width: 780px) {
+  .cinematic-hero > .chapter-content { grid-template-columns: 1fr; min-height: 0; padding: 45px 0 28px; gap: 38px; }
+  .cinematic-hero .hero-copy { max-width: 590px; }
+  .cinematic-hero .hero-product { width: min(100%, 510px); justify-self: end; }
+  .chapter-odysseus .odyssey-art { width: 75%; height: 700px; right: -12%; top: 0; }
+  .cinematic-hero h1 { font-size: clamp(3.2rem, 8vw, 4.8rem); }
+  .chapter-index { margin-bottom: 26px; }
+  .landing-markets > .chapter-content { padding: 65px 0 55px; }
+  .chapter-heading { gap: 25px; }
+  .chapter-athena .odyssey-art { width: 65%; height: 650px; left: -22%; top: 50px; }
+  .landing-markets .market-grid { width: 100%; margin-left: 0; }
+  .landing-trading > .chapter-content { grid-template-columns: 1fr; gap: 40px; padding: 65px 0 70px; }
+  .crossing-copy { max-width: 540px; }
+  .crossing-copy > p, .crossing-steps p { max-width: 430px; }
+  .chapter-poseidon .odyssey-art { width: 80%; height: 650px; left: auto; right: -15%; }
+  .landing-trade-panel { width: min(100%, 540px); justify-self: end; }
+  .landing-destination > .chapter-content { grid-template-columns: 1fr; padding-top: 65px; gap: 40px; }
+  .chapter-ithaca .odyssey-art { width: 130%; right: -28%; height: 75%; }
+  .destination-note { padding-top: 35px; }
+}
+@media (max-width: 640px) {
+  .odyssey-art { transform: translate3d(0, calc(var(--odyssey-shift, 0px) * .4), 0); }
+  .odyssey-wave-layer { transform: translate3d(calc(var(--wave-shift, 0px) * .4), 0, 0); }
+  .cinematic-hero > .chapter-content { padding-top: 36px; }
+  .chapter-odysseus .odyssey-art { width: 100%; height: 560px; right: -28%; }
+  .cinematic-hero .hero-copy > p { font-size: .84rem; }
+  .cinematic-hero .hero-product { padding-left: 12px; }
+  .voyage-marker { font-size: .53rem; letter-spacing: .06em; }
+  .chapter-heading { grid-template-columns: 1fr; gap: 22px; margin-bottom: 30px; }
+  .chapter-heading h2, .crossing-copy h2, .destination-copy h2 { font-size: 3.4rem; }
+  .landing-markets .market-grid { grid-template-columns: 1fr; gap: 18px; }
+  .landing-markets .market-card { padding: 22px; }
+  .chapter-athena .odyssey-art { width: 95%; left: 15%; top: 0; }
+  .chapter-ithaca .odyssey-art { width: 145%; height: 400px; right: -35%; top: 110px; bottom: auto; }
+  .landing-trade-panel, .landing-leaderboard, .leaderboard-invitation { padding: 21px; }
+  .landing-leaderboard th, .landing-leaderboard td { padding: 14px 6px; }
+  .landing-leaderboard th { font-size: .53rem; }
+  .landing-leaderboard td { font-size: .72rem; }
+  .odyssey-waves { height: 85px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .odyssey-art, .odyssey-wave-layer { transform: none !important; opacity: .13 !important; will-change: auto; }
+}
