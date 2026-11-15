@@ -7,8 +7,9 @@ export function TeamSeal({ name, large = false }) {
 
 export default function MarketCard({ market, match, sample, onTrade, onOracle, featured = false, now = Date.now() }) {
   const open = marketIsOpen(market, match, now);
+  const imported = !sample && match.external_reference?.startsWith('pandascore:match:');
   return <article className={`market-card ${featured ? 'featured-market' : ''}`}>
-    <div className="market-meta"><span className="game-label">{match.game === 'CS2' ? 'Counter-Strike 2' : match.game}</span><span className="data-label">{sample ? 'Sample fixture' : match.external_reference?.startsWith('pandascore:match:') ? 'PandaScore import' : 'Account market'}</span></div>
+    <div className="market-meta"><span className="game-label">{match.game === 'CS2' ? 'Counter-Strike 2' : match.game}</span>{imported ? <span className="source-indicator" role="img" aria-label="Imported match from PandaScore" title="Imported match from PandaScore" /> : <span className="data-label">{sample ? 'Sample fixture' : 'Account market'}</span>}</div>
     <div className="market-event">{match.event_name}{match.format ? ` / ${match.format}` : ''}</div>
     <div className="matchup"><div><TeamSeal name="FaZe Clan" large /><strong>FaZe Clan</strong></div><span className="versus">VS</span><div><TeamSeal name={match.opponent} large /><strong>{match.opponent}</strong></div></div>
     <h3>{market.question}</h3>

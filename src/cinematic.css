@@ -108,6 +108,7 @@ th { background: #1c1e1d; }
 .leaderboard-invitation p { color: var(--muted); font-size: .82rem; margin-bottom: 22px; }
 .destination-note { grid-column: 1 / -1; padding-top: 70px; margin: 0; max-width: 530px; color: var(--muted); font-size: .64rem; }
 .chapter-content > * { min-width: 0; }
+.source-indicator { display: inline-block; flex-shrink: 0; width: 9px; height: 9px; margin: 5px; border-radius: 50%; background: #75ce91; outline: 3px solid #75ce911c; }
 @media (max-width: 1050px) {
   .cinematic-hero > .chapter-content { gap: 35px; }
   .cinematic-hero h1 { font-size: 4.4rem; }
