@@ -156,6 +156,7 @@ th { background: #1c1e1d; }
   .odyssey-art, .odyssey-wave-layer { transform: none !important; opacity: .13 !important; will-change: auto; }
 }
 .auth-recovery-link { display: block; margin-top: 16px; }
+.auth-recovery-form > .button-primary { margin-top: 18px; }
 .activity-section { margin-top: 64px; }
 .activity-summary { display: flex; flex-wrap: wrap; gap: 28px 56px; margin: 24px 0; }
 .activity-summary dt { color: var(--muted); font-size: .8rem; }

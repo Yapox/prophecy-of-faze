@@ -48,7 +48,7 @@ export default function AuthDialog({ onClose, onPractice, initialMode = 'login',
   function switchMode(next) { setMode(next); setMessage(''); setPassword(''); setConfirmation(''); }
   if (mode === 'forgot' || mode === 'recovery') return <Dialog title={mode === 'forgot' ? 'Find your way back.' : 'Choose a new password.'} onClose={onClose} busy={busy}>
     <p className="muted">{mode === 'forgot' ? 'Request a secure email link to reset your account password.' : 'Use at least 8 characters. Your wallet and predictions stay with your account.'}</p>
-    <form onSubmit={submit}>
+    <form className="auth-recovery-form" onSubmit={submit}>
       {mode === 'forgot' ? <><label className="field-label" htmlFor="email">Account email</label><input id="email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} /></> : <><label className="field-label" htmlFor="password">New password</label><input id="password" type="password" autoComplete="new-password" minLength={8} required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} /><label className="field-label" htmlFor="confirm-password">Confirm new password</label><input id="confirm-password" type="password" autoComplete="new-password" minLength={8} required value={confirmation} onChange={event => setConfirmation(event.target.value)} disabled={busy} /></>}
       {message && <p className="notice" role="status">{message}</p>}
       <button className="button button-primary w-full" disabled={busy}>{busy ? 'Please wait...' : mode === 'forgot' ? 'Send reset link' : 'Save new password'}</button>
