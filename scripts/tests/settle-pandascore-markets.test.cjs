@@ -40,7 +40,18 @@ function result(winner = 3212) {
   };
 }
 function harness(options = {}) {
-  const state = { markets: options.markets || [market()], results: options.results || [result()], calls: [], posts: [], logs: [], sleeps: [], providerReads: 0 };
+  const state = { markets: options.markets || [market()], results: options.results || [result()], calls: [], posts: [], logs: [], sleeps: [], providerReads: 0, now: options.now ?? NOW };
+  // A contract model only, not the PostgreSQL RPC implementation. Each synthetic
+  // market has one 100-coin position on each side, in separate 900-coin wallets.
+  // This lets dispatch/retry tests observe simulated credits without real money,
+  // SQL, or claiming to prove database locking/unique-constraint behavior.
+  state.positions = state.markets.flatMap((row, index) => ['YES', 'NO'].map(side => ({
+    id: `offline-position-${index}-${side}`, user_id: `offline-user-${index}-${side}`,
+    market_id: row.id, side, stake: 100,
+  })));
+  state.wallets = new Map(state.positions.map(position => [position.user_id, 900]));
+  state.payouts = [];
+  state.outcomes = new Map();
   const json = (data, headers = {}) => new Response(JSON.stringify(data), { status: 200, headers });
   const fetchImpl = async (input, request) => {
     const url = new URL(input);
@@ -66,9 +77,21 @@ function harness(options = {}) {
       state.posts.push(args);
       if (options.rpcTimeout) throw new Error(env.SUPABASE_SECRET_KEY);
       if (options.rpcError) return new Response('private response ' + env.SUPABASE_SECRET_KEY, { status: options.rpcError });
-      // Simulate only the market status response; do NOT execute any settlement.
       const row = state.markets.find(row => row.id === args.p_market_id);
-      row.status = 'resolved'; row.winning_side = args.p_winning_side; row.settled_at = new Date(NOW).toISOString();
+      assert.ok(row, 'RPC must identify one of the returned database markets');
+      if (state.outcomes.has(row.id)) {
+        return new Response(null, { status: state.outcomes.get(row.id) === args.p_winning_side ? 204 : 400 });
+      }
+      // Simulate the existing idempotent RPC contract; no real RPC is executed.
+      state.outcomes.set(row.id, args.p_winning_side);
+      for (const position of state.positions.filter(position => position.market_id === row.id && position.side === args.p_winning_side)) {
+        const amount = position.stake * 2;
+        const balance = state.wallets.get(position.user_id) + amount;
+        state.wallets.set(position.user_id, balance);
+        state.payouts.push({ position_id: position.id, market_id: row.id, kind: 'prediction_payout', amount, balance_after: balance });
+      }
+      row.status = 'resolved'; row.winning_side = args.p_winning_side; row.settled_at = new Date(state.now).toISOString();
+      if (options.rpcTimeoutAfterCommit) throw new Error('Simulated lost response ' + env.SUPABASE_SECRET_KEY);
       return new Response(null, { status: 204 });
     }
     assert.equal(url.origin, 'https://api.pandascore.co');
@@ -76,15 +99,16 @@ function harness(options = {}) {
     assert.equal(request.method, 'GET');
     assert.equal(request.headers.Authorization, 'Bearer ' + env.PANDASCORE_API_TOKEN);
     assert.equal(url.searchParams.has('token'), false);
-    assert.equal(url.searchParams.get('filter[id]'), '1796528');
+    const requestedIds = url.searchParams.get('filter[id]').split(',').map(Number);
+    assert.ok(requestedIds.every(id => state.markets.some(row => referenceId(row.match?.external_reference) === id)));
     state.providerReads++;
     if (options.providerError && (!options.failOnce || state.providerReads === 1)) {
       return new Response('private body ' + env.PANDASCORE_API_TOKEN, { status: options.providerError, headers: { 'Retry-After': String(options.retryAfter ?? 0) } });
     }
     if (options.onProviderRead) options.onProviderRead(state);
-    return json(clone(state.results));
+    return json(clone(options.ignoreResultFilter ? state.results : state.results.filter(row => requestedIds.includes(row.id))));
   };
-  state.run = argv => run({ argv, env, fetchImpl, now: () => NOW,
+  state.run = argv => run({ argv, env, fetchImpl, now: () => state.now,
     sleepImpl: async delay => state.sleeps.push(delay), output: line => state.logs.push(line) });
   return state;
 }
@@ -154,13 +178,113 @@ test('apply dispatch is mocked: correct RPC only, then repeat sees resolved mark
   const h = harness();
   await h.run(['--apply']);
   assert.equal(h.posts.length, 1);
+  assert.deepEqual(h.posts[0], { p_market_id: market().id, p_winning_side: 'YES' });
+  assert.notEqual(h.posts[0].p_market_id, market().match_id);
+  assert.equal(h.payouts.length, 1);
+  assert.equal(h.payouts[0].amount, 200);
+  assert.equal(h.wallets.get('offline-user-0-YES'), 1100);
+  assert.equal(h.wallets.get('offline-user-0-NO'), 900);
   assert.equal(h.providerReads, 2); // Initial plan and fresh pre-write evidence.
   await h.run(['--apply']);
   assert.equal(h.posts.length, 1);
+  assert.equal(h.payouts.length, 1);
+  assert.equal(h.wallets.get('offline-user-0-YES'), 1100);
 });
 test('mocked FaZe loss dispatches NO, never null/refund', async () => {
   const h = harness({ results: [result(222)] }); await h.run(['--apply']);
-  assert.equal(h.posts[0].p_winning_side, 'NO');
+  assert.deepEqual(h.posts, [{ p_market_id: market().id, p_winning_side: 'NO' }]);
+  assert.equal(h.payouts.length, 1);
+  assert.equal(h.payouts[0].amount, 200);
+  assert.equal(h.wallets.get('offline-user-0-NO'), 1100);
+  assert.equal(h.wallets.get('offline-user-0-YES'), 900);
+});
+
+test('two finished matches route opposite sides to their own database market UUIDs', async () => {
+  const second = market();
+  second.id = '20000000-0000-0000-0000-000000000002';
+  second.match_id = '10000000-0000-0000-0000-000000000002';
+  second.match.id = second.match_id;
+  second.match.external_reference = 'pandascore:match:1789256';
+  second.match.opponent = 'Wildcard';
+  second.question = 'Will FaZe Clan beat Wildcard?';
+  const secondResult = result(222);
+  secondResult.id = 1789256;
+  secondResult.opponents[1].opponent.name = 'Wildcard';
+  const h = harness({ markets: [market(), second], results: [result(3212), secondResult] });
+  await h.run(['--apply']);
+  assert.deepEqual(h.posts, [
+    { p_market_id: market().id, p_winning_side: 'YES' },
+    { p_market_id: second.id, p_winning_side: 'NO' },
+  ]);
+  assert.equal(h.payouts.length, 2);
+  await h.run(['--apply']);
+  assert.equal(h.posts.length, 2);
+  assert.equal(h.payouts.length, 2);
+});
+
+test('full mocked flow blocks at 14:59.999 and permits exactly 15 minutes after latest result update', async () => {
+  const readyAt = Date.parse(result().modified_at) + 15 * 60 * 1000;
+  const h = harness({ now: readyAt - 1 });
+  assert.equal((await h.run(['--apply'])).length, 0);
+  assert.equal(h.posts.length, 0);
+  assert.equal(h.payouts.length, 0);
+  assert.ok(h.logs.some(line => line.includes('result_stabilization_wait')));
+  h.now = readyAt;
+  await h.run(['--apply']);
+  assert.deepEqual(h.posts, [{ p_market_id: market().id, p_winning_side: 'YES' }]);
+  assert.equal(h.payouts.length, 1);
+});
+
+test('stabilization uses the later of end_at and modified_at', async () => {
+  const r = result();
+  r.modified_at = '2030-01-02T10:59:00Z';
+  const readyAt = Date.parse(r.end_at) + 15 * 60 * 1000;
+  const h = harness({ results: [r], now: readyAt - 1 });
+  await h.run(['--apply']); assert.equal(h.posts.length, 0);
+  h.now = readyAt;
+  await h.run(['--apply']); assert.equal(h.posts.length, 1);
+});
+
+test('new result modification restarts the stabilization wait', async () => {
+  const r = result(); r.modified_at = '2030-01-02T11:59:00Z';
+  const h = harness({ results: [r] });
+  await h.run(['--apply']); assert.equal(h.posts.length, 0);
+  h.now = Date.parse(r.modified_at) + 15 * 60 * 1000;
+  await h.run(['--apply']); assert.equal(h.posts.length, 1);
+});
+
+test('result updated during pre-write recheck never dispatches before its new grace period', async () => {
+  const h = harness({ onProviderRead: state => {
+    if (state.providerReads === 2) state.results[0].modified_at = '2030-01-02T11:59:00Z';
+  } });
+  await assert.rejects(() => h.run(['--apply']), /changed during review/);
+  assert.equal(h.posts.length, 0); assert.equal(h.payouts.length, 0);
+});
+
+test('committed-but-lost mocked RPC response is not automatically retried and rerun adds no credit', async () => {
+  const h = harness({ rpcTimeoutAfterCommit: true });
+  await assert.rejects(() => h.run(['--apply']), /may have committed/);
+  assert.equal(h.posts.length, 1);
+  assert.equal(h.payouts.length, 1);
+  assert.equal(h.wallets.get('offline-user-0-YES'), 1100);
+  await h.run(['--apply']);
+  assert.equal(h.posts.length, 1);
+  assert.equal(h.payouts.length, 1);
+  assert.equal(h.wallets.get('offline-user-0-YES'), 1100);
+});
+
+test('dry-run for both winners makes zero RPC calls and zero simulated payouts', async () => {
+  for (const winner of [3212, 222]) {
+    for (const argv of [[], ['--dry-run']]) {
+      const h = harness({ results: [result(winner)] });
+      const plans = await h.run(argv);
+      assert.equal(plans.length, 1);
+      assert.equal(plans[0].rpc.p_winning_side, winner === 3212 ? 'YES' : 'NO');
+      assert.equal(h.posts.length, 0);
+      assert.equal(h.payouts.length, 0);
+      assert.ok([...h.wallets.values()].every(balance => balance === 900));
+    }
+  }
 });
 test('ambiguous results dispatch no RPC even in mocked apply', async () => {
   for (const [, mutate] of unsafeCases) {
@@ -192,6 +316,12 @@ test('conflicting duplicate provider records abort', async () => {
 test('PandaScore access failure stops before a proposal or RPC', async () => {
   const h = harness({ providerError: 403 }); await assert.rejects(() => h.run(['--apply']), /HTTP 403/);
   assert.equal(h.posts.length, 0);
+});
+test('unexpected provider match ID aborts instead of routing a result to the wrong market', async () => {
+  const unexpected = result(); unexpected.id = 999999;
+  const h = harness({ results: [unexpected], ignoreResultFilter: true });
+  await assert.rejects(() => h.run(['--apply']), /unexpected ID/);
+  assert.equal(h.posts.length, 0); assert.equal(h.payouts.length, 0);
 });
 test('429 retries are bounded and respect Retry-After', async () => {
   const once = harness({ providerError: 429, failOnce: true, retryAfter: 2 }); await once.run([]);
