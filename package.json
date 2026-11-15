@@ -9,6 +9,7 @@
     "check:render": "node scripts/check-render.mjs",
     "test": "node --test scripts/domain.test.mjs scripts/oracle.test.mjs",
     "check:flow": "node scripts/check-flow.mjs",
+    "check:auth": "node scripts/check-auth.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
