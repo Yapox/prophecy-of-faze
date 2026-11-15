@@ -104,7 +104,8 @@ try {
   for (const [index, opponent] of ['fnatic', 'Wildcard'].entries()) {
     assert.match(cards[index].textContent, new RegExp(`Will FaZe Clan beat ${opponent}\\?`));
     assert.equal(cards[index].querySelectorAll('.team-seal')[1].textContent, opponent[0].toUpperCase());
-    assert.match(cards[index].querySelector('.data-label').textContent, /PandaScore/);
+    assert.equal(cards[index].querySelector('.source-indicator')?.getAttribute('aria-label'), 'Imported match from PandaScore');
+    assert.equal(cards[index].querySelector('.data-label'), null);
     assert.equal(cards[index].querySelector('.yes-button').disabled, false);
   }
   const initialReads = matchReads;

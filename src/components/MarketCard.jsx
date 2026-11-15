@@ -14,7 +14,7 @@ export default function MarketCard({ market, match, sample, onTrade, onOracle, f
     <div className="matchup"><div><TeamSeal name="FaZe Clan" large /><strong>FaZe Clan</strong></div><span className="versus">VS</span><div><TeamSeal name={match.opponent} large /><strong>{match.opponent}</strong></div></div>
     <h3>{market.question}</h3>
     <div className="contract-options"><button className="contract-button yes-button" onClick={() => onTrade(market.id, 'YES')} disabled={!open}><span>Yes</span><strong>1 coin</strong></button><button className="contract-button no-button" onClick={() => onTrade(market.id, 'NO')} disabled={!open}><span>No</span><strong>1 coin</strong></button></div>
-    <p className="contract-note">Per contract. Correct prediction returns 2 virtual coins.</p>
+    <p className="contract-note">Correct call: 2 virtual coins per contract.</p>
     <div className="market-bottom"><span>{market.status === 'resolved' ? `Resolved: ${market.winning_side}` : market.status === 'cancelled' ? 'Cancelled: stakes refunded' : open ? `Starts ${formatTime(match.starts_at)}` : 'Closed. Awaiting result.'}</span><button className="text-link" onClick={() => onOracle(market.id)}>Match brief</button></div>
   </article>;
 }

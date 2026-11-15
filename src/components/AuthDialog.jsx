@@ -56,8 +56,17 @@ export default function AuthDialog({ onClose, onPractice, initialMode = 'login',
     <button className="text-link auth-switch" disabled={busy} onClick={() => switchMode(mode === 'forgot' ? 'login' : 'forgot')}>{mode === 'forgot' ? 'Back to sign in' : 'Request a new reset link'}</button>
   </Dialog>;
   return <Dialog title={mode === 'login' ? 'Welcome to the arena.' : 'Start your own odyssey.'} onClose={onClose} busy={busy}>
-    {isConfigured ? <><p className="muted">{mode === 'login' ? 'Sign in to access your account wallet and predictions.' : 'New accounts receive 1,000 free virtual coins from the backend.'}</p><form onSubmit={submit}><label className="field-label" htmlFor="email">Email</label><input id="email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} /><label className="field-label" htmlFor="password">Password</label><input id="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'signup' ? 8 : undefined} required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} /><p className="form-note">Read the <a href="#terms" onClick={onClose}>draft terms</a> and <a href="#privacy" onClick={onClose}>privacy notice</a> before creating an account.</p>{message && <p className="notice" role="status">{message}</p>}<button className="button button-primary w-full" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}</button></form><button className="text-link auth-switch" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); }}>{mode === 'login' ? 'New here? Create an account' : 'Already have an account? Sign in'}</button></>
-      : <><p className="muted">Account sign-in becomes available when the project is connected to Supabase. You can use the complete practice experience now.</p><p className="notice">Practice predictions are saved in this browser. They are separate from Supabase accounts.</p><button className="button button-primary w-full" onClick={onPractice}>Continue in practice mode</button></>}
+    {isConfigured ? <>
+      <p className="muted">{mode === 'login' ? 'Your next call awaits.' : 'Start your odyssey with 1,000 free virtual coins.'}</p>
+      <form onSubmit={submit}>
+        <label className="field-label" htmlFor="email">Email</label><input id="email" type="email" autoComplete="email" required value={email} onChange={event => setEmail(event.target.value)} disabled={busy} />
+        <label className="field-label" htmlFor="password">Password</label><input id="password" type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'signup' ? 8 : undefined} required value={password} onChange={event => setPassword(event.target.value)} disabled={busy} />
+        <p className="form-note"><a href="#terms" onClick={onClose}>Draft terms</a> · <a href="#privacy" onClick={onClose}>Privacy notice</a></p>
+        {message && <p className="notice" role="status">{message}</p>}
+        <button className="button button-primary w-full" disabled={busy}>{busy ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}</button>
+      </form>
+      <button className="text-link auth-switch" disabled={busy} onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setMessage(''); }}>{mode === 'login' ? 'New here? Create an account' : 'Already have an account? Sign in'}</button>
+    </> : <><p className="muted">Account sign-in is unavailable. Try practice mode, saved on this device.</p><button className="button button-primary w-full" onClick={onPractice}>Continue in practice mode</button></>}
     {isConfigured && mode === 'login' && <button className="text-link auth-recovery-link" disabled={busy} onClick={() => switchMode('forgot')}>Forgot password?</button>}
   </Dialog>;
 }

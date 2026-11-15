@@ -32,7 +32,7 @@ export default function TradeDialog({ market, match, initialSide, initialQuantit
     }
   }
   return <Dialog title={confirmed ? 'Your prediction is placed.' : 'Make your prediction'} onClose={onClose} busy={arena.busy}>
-    {confirmed ? <div className="trade-success"><span className="success-seal" aria-hidden="true">P</span><p>Your simulated position is now in your portfolio. The wallet has been debited once.</p><button className="button button-primary w-full" onClick={onPortfolio}>View portfolio</button><button className="button button-quiet w-full" onClick={onClose}>Keep exploring</button></div> : <>
+    {confirmed ? <div className="trade-success"><span className="success-seal" aria-hidden="true">P</span><p>Follow the result in your portfolio.</p><button className="button button-primary w-full" onClick={onPortfolio}>View portfolio</button><button className="button button-quiet w-full" onClick={onClose}>Keep exploring</button></div> : <>
       <div className="trade-context"><span className="game-label">{match.game} / {arena.mode === 'demo' ? 'Sample fixture' : 'Account market'}</span><h3>{market.question}</h3></div>
       <form onSubmit={submit}>
         <fieldset disabled={locked}><legend>Choose your outcome</legend><div className="outcome-toggle">{['YES', 'NO'].map(choice => <button key={choice} type="button" aria-pressed={side === choice} className={side === choice ? 'active' : ''} onClick={() => setSide(choice)}>{choice === 'YES' ? 'Yes, FaZe wins' : 'No, FaZe loses'}</button>)}</div>

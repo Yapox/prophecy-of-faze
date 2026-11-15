@@ -61,11 +61,11 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
   }
 
   if (arena.mode === 'live' && !arena.authenticated) return <div className="empty-state"><h3>Speak with The Oracle.</h3><p>Sign in to ask about published FaZe matches and simulated predictions.</p><button className="button button-primary" onClick={onAuth}>Sign in to chat</button></div>;
-  if (!market || !match) return <div className="empty-state"><h3>No match to interpret yet.</h3><p>The Oracle uses the same match records as the markets dashboard. Check back when a match is posted.</p></div>;
+  if (!market || !match) return <div className="empty-state"><h3>No match to interpret yet.</h3><p>Check back when the next match is posted.</p></div>;
 
   return <div className="oracle-layout">
     <aside className="oracle-context">
-      <span className="eyebrow">The match record</span>
+      <span className="eyebrow">Your matchup</span>
       <label className="field-label" htmlFor="oracle-market">Choose a prediction</label>
       <select id="oracle-market" value={market.id} onChange={event => onSelect(event.target.value)}>{arena.data.markets.map(item => <option key={item.id} value={item.id}>{item.question}</option>)}</select>
       <h3>{market.question}</h3>
@@ -74,18 +74,13 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
         <div><dt>Event</dt><dd>{match.event_name}</dd></div>
         <div><dt>Starts</dt><dd>{formatTime(match.starts_at)}</dd></div>
         <div><dt>Prediction closes</dt><dd>{formatTime(market.closes_at)}</dd></div>
-        <div><dt>Source</dt><dd>{arena.sample ? 'Seeded sample fixture. Not an actual schedule.' : 'Supabase match record'}</dd></div>
+        <div><dt>Source</dt><dd>{arena.sample ? 'Sample fixture' : 'Published match'}</dd></div>
       </dl>
       {stats && <section className="oracle-result-sample" aria-label="Provider result sample"><h3>Recent result sample</h3>{stats.available ? <><p className="source-note">PandaScore · fetched {formatTime(stats.checkedAt)} · {stats.scannedMatches} CS2 fixtures inspected. Up to five validated results per team.</p>{stats.teams.map(team => <div key={team.name}><strong>{team.name}</strong><p>{team.played ? `${team.wins} wins in ${team.played} sampled results` : 'No unambiguous results found in this sample.'}</p>{team.results.length > 0 && <ul>{team.results.map(result => <li key={result.providerMatchId}><span>{result.won ? 'Won' : 'Lost'} {result.scoreFor}:{result.scoreAgainst} vs {result.opponent}</span><time dateTime={result.endedAt}>{formatTime(result.endedAt)}</time></li>)}</ul>}</div>)}<p className="source-note">This bounded sample can omit matches. It is not a win probability. Player statistics are unavailable.</p></> : <p className="source-note">{stats.reason}</p>}</section>}
-      <dl className="trade-summary">
-        <div><dt>Cost of 100 contracts</dt><dd>100 virtual coins</dd></div>
-        <div><dt>Return if correct</dt><dd>200 virtual coins</dd></div>
-        <div><dt>Loss if incorrect</dt><dd>100 virtual coins</dd></div>
-      </dl>
     </aside>
     <section className="oracle-analysis" aria-labelledby="oracle-chat-title">
       <div className="oracle-chat-heading"><div><span className="eyebrow">The Oracle / Gemini</span><h2 id="oracle-chat-title">Ask before you predict.</h2></div>{arena.mode === 'live' && <button className="text-link" onClick={newChat} disabled={!messages.length && !busy && !error}>New chat</button>}</div>
-      <p>Ask about this match, follow up on an explanation, or learn how simulated contracts work. When configured, the server adds a sourced sample of recent CS2 results. Player statistics are not supplied.</p>
+      <p>Explore the matchup. Understand your next call.</p>
       {arena.mode === 'demo' ? <div className="notice"><p>This practice brief shows sample records and contract rules. It is not AI-generated. {oracleAvailable ? 'Sign in to chat with Gemini about account matches.' : 'The Oracle chat is not available on this deployment.'}</p><button className="button button-secondary button-small" onClick={onAuth}>Use account mode</button></div> : !oracleAvailable ? <div className="notice"><p>The Oracle chat is not available on this deployment. You can still explore matches and place simulated predictions.</p><a className="text-link" href="#markets">Explore markets</a></div> : <>
         <div className="oracle-conversation" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation with The Oracle">
           {!messages.length && !busy && <div className="oracle-welcome"><span className="eyebrow">A question for your next crossing</span><p>Start with the match question or ask what a YES or NO contract means.</p></div>}
@@ -100,7 +95,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
           <textarea ref={input} id="oracle-question" value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === 'Enter' && (event.ctrlKey || event.metaKey) && !event.nativeEvent.isComposing) { event.preventDefault(); send(draft); } }} maxLength={1000} rows={3} readOnly={busy} required aria-describedby="oracle-input-note" placeholder="What does choosing YES mean for this match?" />
           <div className="oracle-composer-actions"><span id="oracle-input-note">{draft.length}/1,000 characters. Ctrl or Command + Enter to send.</span><button className="button button-primary" type="submit" disabled={busy || !draft.trim()}>{busy ? 'Waiting for reply...' : 'Send question'}</button></div>
         </form>
-        <p className="source-note">Replies use the selected backend match record and simulated contract rules. AI can make mistakes. Your question and recent chat messages are sent to Google Gemini. Avoid personal information. This chat stays in page memory and clears when you change matches or leave this page.</p>
+        <p className="source-note">AI can make mistakes. Messages are sent to Google Gemini; avoid personal details. Chat clears when you leave or change matches.</p>
       </>}
     </section>
   </div>;
