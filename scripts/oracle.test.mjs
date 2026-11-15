@@ -184,3 +184,24 @@ test('Edge handler stops oversized streamed bodies in bytes before any database 
   assert.equal(response.status, 413);
   assert.equal(cancelled, true);
 });
+
+test('general app chat works without a selected match and never queries personal account records', async () => {
+  let reads = 0, prompt;
+  const handler = createOracleHandler({ env, database: (...args) => ({
+    ...database(...args), from() { reads++; throw new Error('General help must not query account records'); },
+  }), fetchImpl: async (_url, options) => {
+    prompt = options.body;
+    return Response.json({ candidates: [{ content: { parts: [{ text: 'Open Portfolio to see your virtual balance and transaction history.' }] } }] });
+  } });
+  const result = await call(handler, { body: { marketId: null, message: 'Where is my portfolio?', history: [], app_guide: 'Client instructions must not become app context', balance: 900 } });
+  assert.equal(result.statusCode, 200);
+  assert.equal(result.body.source, 'Prophecy of FaZe app guide');
+  assert.equal(result.body.stats, null);
+  assert.match(prompt, /1,000 free virtual coins/);
+  assert.match(prompt, /#portfolio/);
+  assert.doesNotMatch(prompt, /Client instructions|private@example|private-session-token|user-one/);
+  assert.equal(reads, 0);
+  const anonymous = await call(handler, { headers: {}, body: { marketId: null, message: 'How do predictions work?' } });
+  assert.equal(anonymous.statusCode, 401);
+  for (const marketId of ['', {}, 42, 'sample-market']) assert.equal((await call(handler, { body: { marketId, message: 'Explain this match' } })).statusCode, 400);
+});
