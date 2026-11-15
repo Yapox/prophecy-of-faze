@@ -2,6 +2,10 @@
 
 React frontend for the virtual coin prediction backend in `supabase/migrations`.
 
+**Live website:** https://yapox.github.io/prophecy-of-faze/
+
+See [deployment and activation](docs/DEPLOYMENT.md) for GitHub Pages, the separate Oracle server, recovery links, and match/payout automation. [Release status](docs/RELEASE_STATUS.md) distinguishes implemented features from pending deployment and live verification.
+
 ## Run locally
 
 1. Install Node.js 20 or newer, then run `npm install`.
@@ -37,7 +41,7 @@ The Oracle supports questions, follow-ups, suggested prompts, and New chat. It k
 
 The endpoint limits requests to five per user per minute per process, caps question/history sizes, and handles quotas, provider failures, and timeouts. Durable rate limiting and provider spending limits need deployment review before public use. A missing Gemini key produces an explicit unavailable message, preserving the question for retry. Practice briefs are not presented as AI-generated. Verified performance statistics remain future work; imported PandaScore fixture records are read from Supabase. See [Oracle chat setup and checks](docs/ORACLE_CHAT.md).
 
-`vercel.json` declares the Vite build and `dist` output. Hash navigation requires no SPA rewrite. Deploy with the public Supabase variables and server-only Gemini configuration. No deployment has been performed from this workspace.
+`vercel.json` declares the Vite build, `dist` output, and the Oracle function duration. The public frontend is deployed on GitHub Pages. The Oracle server has not been deployed from this workspace. Pages can call a separately hosted Oracle through the public `VITE_ORACLE_URL` variable and server `ORACLE_ALLOWED_ORIGINS`. Hash navigation requires no SPA rewrite.
 
 Implementation references: [Tailwind’s Vite integration](https://tailwindcss.com/docs/installation/using-vite), [Gemini content generation](https://ai.google.dev/api/generate-content), [Supabase user verification](https://supabase.com/docs/reference/javascript/auth-getuser), and [Vercel functions](https://vercel.com/docs/functions/quickstart).
 
@@ -54,3 +58,15 @@ Implementation references: [Tailwind’s Vite integration](https://tailwindcss.c
 The public Supabase key was accepted by the deployed Auth settings endpoint. Signed-in signup/purchase/payout checks still require an email-confirmed test account. The cinematic landing page has been inspected in headless Chromium at desktop and mobile widths, with overflow checks at 320, 390, 768, and 1440 pixels, reduced-motion checks, keyboard skip-link checks, and a completed browser-local practice trade. These checks do not verify live account purchases or settlement. Screenshots and the browser report are saved under ignored `artifacts/cinematic/`.
 
 The Terms and Privacy pages are drafts. Operator/contact details, eligibility, jurisdiction, retention, and account deletion/export processes still need review.
+
+## Completion updates
+
+Password reset is available from Sign in > Forgot password. Recovery links open a password-confirmation form; signup and recovery preserve the GitHub repository path. The exact callback URLs must be allowed in Supabase Auth settings.
+
+The leaderboard shows current/longest daily prediction streaks, winning-market streaks, a seven-day activity history, and two daily participation goals. Days use UTC. Multiple purchases on a day do not increase the day streak, and winning streaks use each settled market's net profit. Goals award no extra coins.
+
+The Oracle can optionally include a source-labeled recent PandaScore result sample. It scans at most 200 past CS2 records, caches reads for five minutes, and includes up to five validated results per team. It does not claim complete recent form, player statistics, probabilities, or verified rosters. Provider errors preserve chat without inventing statistics.
+
+The new automation migration and `sync-pandascore-markets.cjs` publish fixtures and questions atomically, handle untraded reschedules, and refund open positions for source drift while preserving purchased terms for review. Audited settlements record provider evidence in the existing payout transaction. GitHub jobs stay in dry-run until their explicit repository variables are activated. The migration supplies optional shared Oracle quotas.
+
+Additional checks: `npm run check:database` executes actual SQL in isolated PostgreSQL; `npm run check:automation` runs offline fixture and settlement tests. These do not change the live Supabase project.

@@ -1,6 +1,6 @@
 # PandaScore settlement preparation
 
-This is a server-side Node.js 20+ tool for the existing Prophecy of FaZe schema. No migration, deployment, scheduler, or live settlement is included in preparation. The script defaults to a **GET-only dry-run**; `--apply` is a separate explicit write mode.
+This is a server-side Node.js 20+ tool for Prophecy of FaZe. The script defaults to a **GET-only dry-run**; `--apply` is a separate write mode. The repository now includes an optional automation migration and a scheduled workflow with an explicit apply control. Those require deployment/activation as described in [DEPLOYMENT.md](DEPLOYMENT.md). No live settlement was performed during implementation.
 
 ## Feasibility on Fixtures Only
 
@@ -55,14 +55,14 @@ Default dry-run prints only reviewed RPC proposals and constant skip reasons. Ap
 ## Risks and limits before automatic operation
 
 - **Provider corrections:** payout idempotency prevents paying twice; it does not make a wrong first payout correct. The RPC cannot reverse a committed outcome. This tool reads open markets, so it does not monitor corrections to already-settled markets. Conflicting corrections need manual handling.
-- **No durable provenance:** the existing schema does not store the provider result snapshot, winner team IDs, or evidence hash used for settlement. Terminal proposals are not a durable audit record. A production audit design is future work, not a migration in this change.
+- **Provenance:** the original RPC does not store provider evidence. With the new migration and `PANDASCORE_AUDIT=true`, the script calls `settle_pandascore_prediction` with its validated evidence and stores the first settlement receipt atomically. The scheduled workflow selects this audited mode. Existing historical settlements are not retroactively reconstructed.
 - **Reschedules:** the current importer does not update existing match dates. Schedule drift and explicit reschedules are intentionally skipped; review the market's original betting window before resolving them.
 - **Special outcomes:** forfeits, draws, cancellation, and ambiguous data require a defined manual policy. This script does not automatically cancel or refund.
 - **Read/write races:** external API reads and the RPC are not one transaction. Revalidation narrows that gap; the existing RPC protects status and payout concurrency. Do not concurrently edit market identity/question/schedule through privileged tools. An RPC-side evidence/identity guard would require separately reviewed backend changes.
 - **Partial batches:** each RPC commits independently. If a later call fails or its response is lost, earlier markets may already be settled. Inspect state and rerun a dry-run before proceeding. No automatic POST retry is performed.
 - **Availability:** bounded page limits, unexpected payloads, quota exhaustion, or missing results cause deferral/failure, not a guessed NO outcome. Pagination of changing data can defer a market to a later run.
 
-Use manual review of the initial proposals before enabling scheduled apply runs. No cron job or unattended automation is configured here.
+Review initial dry-run proposals before setting `PANDASCORE_SETTLEMENT_ENABLED=true`. The workflow defaults to dry-run; its apply mode requires the new migration. Ambiguous or special outcomes are still deferred to review.
 
 ## Credentials and secure dry-run
 

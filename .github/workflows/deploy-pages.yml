@@ -32,11 +32,21 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Install dependencies
         run: npm ci
+      - name: Verify application and database contracts
+        run: |
+          npm test
+          npm run check:auth
+          npm run check:account
+          npm run check:chat
+          npm run check:database
+          npm run check:automation
       - name: Build frontend
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_ORACLE_URL: ${{ vars.VITE_ORACLE_URL }}
+          VITE_OPERATOR_NAME: ${{ vars.VITE_OPERATOR_NAME }}
+          VITE_SUPPORT_EMAIL: ${{ vars.VITE_SUPPORT_EMAIL }}
         run: |
           test -n "$VITE_SUPABASE_URL" || { echo 'Set VITE_SUPABASE_URL in repository Actions variables.'; exit 1; }
           test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || { echo 'Set VITE_SUPABASE_PUBLISHABLE_KEY in repository Actions variables.'; exit 1; }

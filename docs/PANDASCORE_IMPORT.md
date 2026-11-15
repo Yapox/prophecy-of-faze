@@ -1,5 +1,7 @@
 # Insert-only PandaScore match importer
 
+This page describes the original match-only CLI. For atomic match **and market** publication, scheduled jobs, and reschedule handling, use `sync-pandascore-markets.cjs` and the migration/activation steps in [DEPLOYMENT.md](DEPLOYMENT.md). The original importer below remains insert-only.
+
 Run `scripts/import-pandascore-matches.cjs` from a trusted server-side Node.js 20+ environment. It uses native `fetch`; no npm packages, browser client, Supabase Auth login, or database password is needed. This guide does not authorize or perform a live import.
 
 ## Modes

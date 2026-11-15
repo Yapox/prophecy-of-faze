@@ -1,5 +1,13 @@
 # The Oracle: Gemini chat
 
+## Current hosting and optional provider context
+
+The frontend is published on GitHub Pages. The server endpoint needs a separate Node deployment and private Gemini configuration. Set Pages `VITE_ORACLE_URL` to the actual HTTPS server `/api/oracle` URL and server `ORACLE_ALLOWED_ORIGINS=https://yapox.github.io`. See [DEPLOYMENT.md](DEPLOYMENT.md) for exact settings and activation steps. Without a configured endpoint, Pages displays an unavailable notice.
+
+When server `PANDASCORE_API_TOKEN` is present, CS2 questions may include a validated, bounded recent-result sample from PandaScore. The source panel displays results, sample counts, retrieval time, and coverage limits. No player performance statistics or win probability is supplied. Missing provider context never becomes invented model facts. The client timeout is now 40 seconds, allowing provider reads plus the 20-second Gemini timeout.
+
+After applying the new migration, enable `ORACLE_DURABLE_RATE_LIMIT=true` for shared five-per-user/minute and 500-total-per-UTC-day reservations. Provider spending limits and the actual audience/provider terms still need operator configuration.
+
 ## Enable locally
 
 1. Create a Gemini API key in your Google AI project. Follow [Google's API key guide](https://ai.google.dev/gemini-api/docs/api-key).
