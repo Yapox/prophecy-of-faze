@@ -3,16 +3,20 @@ const id = value => Number.isSafeInteger(value) && value > 0;
 
 export function summarizeResults(records, opponentName, now = Date.now()) {
   const valid = [];
-  const seen = new Set();
+  const unique = new Map(), conflicting = new Set();
   for (const row of records) {
-    const teams = row?.opponents?.map(entry => entry?.type === 'Team' ? entry.opponent : null);
-    if (!id(row?.id) || seen.has(row.id) || row.status !== 'finished' || row.draw !== false || row.forfeit !== false || row.rescheduled === true || !Number.isFinite(Date.parse(row.end_at)) || Date.parse(row.end_at) > now || !Array.isArray(teams) || teams.length !== 2 || teams.some(team => !id(team?.id) || !team.name) || teams[0].id === teams[1].id || !teams.some(team => team.id === row.winner_id)) continue;
+    if (!id(row?.id) || conflicting.has(row.id)) continue;
+    if (unique.has(row.id) && JSON.stringify(unique.get(row.id)) !== JSON.stringify(row)) { unique.delete(row.id); conflicting.add(row.id); }
+    else unique.set(row.id, row);
+  }
+  for (const row of unique.values()) {
+    const teams = Array.isArray(row?.opponents) ? row.opponents.map(entry => entry?.type === 'Team' ? entry.opponent : null) : null;
+    if (row.status !== 'finished' || row.draw !== false || row.forfeit !== false || row.rescheduled === true || row.complete === false || !Number.isFinite(Date.parse(row.end_at)) || Date.parse(row.end_at) > now || !Array.isArray(teams) || teams.length !== 2 || teams.some(team => !id(team?.id) || !team.name) || teams[0].id === teams[1].id || !teams.some(team => team.id === row.winner_id)) continue;
     if (row.winner?.id != null && row.winner.id !== row.winner_id) continue;
     if (!Array.isArray(row.results) || row.results.length !== 2 || new Set(row.results.map(result => result.team_id)).size !== 2 || row.results.some(result => !teams.some(team => team.id === result.team_id) || !Number.isSafeInteger(result.score) || result.score < 0)) continue;
     const winner = row.results.find(result => result.team_id === row.winner_id);
     const loser = row.results.find(result => result.team_id !== row.winner_id);
     if (winner.score <= loser.score) continue;
-    seen.add(row.id);
     valid.push({ ...row, teams });
   }
   valid.sort((a, b) => Date.parse(b.end_at) - Date.parse(a.end_at) || b.id - a.id);

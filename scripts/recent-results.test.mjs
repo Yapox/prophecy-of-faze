@@ -11,6 +11,7 @@ test('provider result samples reject incomplete and conflicting results without 
   assert.equal(summarizeResults(records, 'Unknown', now)[1].played, 0);
   const conflicting = { ...result, id: 127, opponents: [result.opponents[0], { type: 'Team', opponent: { id: 100, name: 'fnatic' } }], results: [result.results[0], { team_id: 100, score: 1 }] };
   assert.equal(summarizeResults([...records, conflicting], 'fnatic', now)[1].played, 0);
+  assert.equal(summarizeResults([result, { ...result, winner_id: 99 }], 'fnatic', now)[0].played, 0, 'Conflicting duplicates are excluded rather than choosing the first');
 });
 test('recent results are server-authenticated, cached, bounded, and fail with a clear unavailable state', async () => {
   let calls = 0;
