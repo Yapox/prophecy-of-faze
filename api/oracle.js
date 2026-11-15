@@ -29,6 +29,17 @@ export function createOracleHandler({ env = process.env, fetchImpl = fetch, data
       res.setHeader('Cache-Control', 'no-store');
       res.end(JSON.stringify(data));
     };
+    const origin = req.headers.origin;
+    if (origin) {
+      const configuredOrigins = (env.ORACLE_ALLOWED_ORIGINS || '').split(',').map(value => value.trim()).filter(Boolean);
+      const ownOrigins = req.headers.host ? [`https://${req.headers.host}`, ...(/^localhost(?::\d+)?$|^127\.0\.0\.1(?::\d+)?$/.test(req.headers.host) ? [`http://${req.headers.host}`] : [])] : [];
+      if (![...configuredOrigins, ...ownOrigins].includes(origin)) return send(403, { error: 'This website is not allowed to use The Oracle endpoint.' });
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+      if (req.method === 'OPTIONS') { res.statusCode = 204; res.setHeader('Access-Control-Max-Age', '600'); return res.end(); }
+    }
     if (req.method !== 'POST') { res.setHeader('Allow', 'POST'); return send(405, { error: 'Use POST to chat with The Oracle.' }); }
     const bearer = req.headers.authorization;
     if (typeof bearer !== 'string' || !bearer.startsWith('Bearer ') || bearer.length > 8192) return send(401, { error: 'Sign in to use The Oracle.' });

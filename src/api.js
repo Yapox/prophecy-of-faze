@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
+import { oracleEndpoint } from './oracleEndpoint.js';
 
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const isConfigured = Boolean(url && key?.startsWith('sb_publishable_'));
-export const oracleAvailable = import.meta.env.VITE_STATIC_HOSTING !== 'true';
+const oracleUrl = oracleEndpoint(import.meta.env);
+export const oracleAvailable = Boolean(oracleUrl);
 export const supabase = isConfigured
   ? createClient(url, key, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
@@ -95,7 +97,7 @@ export async function askOracle(marketId, message, history = [], { signal } = {}
   if (!supabase) throw new Error('Account mode is not configured.');
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('Sign in to use The Oracle.');
-  const response = await fetch('/api/oracle', {
+  const response = await fetch(oracleUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify({ marketId, message, history }),

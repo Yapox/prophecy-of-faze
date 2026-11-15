@@ -36,6 +36,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_ORACLE_URL: ${{ vars.VITE_ORACLE_URL }}
         run: |
           test -n "$VITE_SUPABASE_URL" || { echo 'Set VITE_SUPABASE_URL in repository Actions variables.'; exit 1; }
           test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || { echo 'Set VITE_SUPABASE_PUBLISHABLE_KEY in repository Actions variables.'; exit 1; }

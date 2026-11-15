@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createOracleHandler, MAX_ORACLE_BODY_BYTES } from '../api/oracle.js';
+import { oracleEndpoint } from '../src/oracleEndpoint.js';
 
 const marketId = '00000000-0000-0000-0000-000000000001';
 const env = { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'public-test-key', GEMINI_API_KEY: 'server-test-key', GEMINI_MODEL: 'test-model' };
@@ -15,7 +16,7 @@ function database(_url, _key, options) {
   };
 }
 async function call(handler, overrides = {}) {
-  const response = { statusCode: 0, headers: {}, setHeader(key, value) { this.headers[key] = value; }, end(body) { this.body = JSON.parse(body); } };
+  const response = { statusCode: 0, headers: {}, setHeader(key, value) { this.headers[key] = value; }, end(body) { this.body = body ? JSON.parse(body) : null; } };
   await handler({ method: 'POST', headers: { authorization: 'Bearer private-session-token' }, body: { marketId }, ...overrides }, response);
   return response;
 }
@@ -117,4 +118,22 @@ test('Oracle uses a server default model and handles quota and empty replies saf
   assert.equal((await call(empty)).statusCode, 502);
   const unsafeModel = createOracleHandler({ env: { ...env, GEMINI_MODEL: '../not-a-model' }, database });
   assert.equal((await call(unsafeModel)).statusCode, 503);
+});
+
+test('Pages can use a separate HTTPS Oracle host without allowing unsafe endpoints', () => {
+  assert.equal(oracleEndpoint({ VITE_STATIC_HOSTING: 'true' }), null);
+  assert.equal(oracleEndpoint({}), '/api/oracle');
+  assert.equal(oracleEndpoint({ VITE_STATIC_HOSTING: 'true', VITE_ORACLE_URL: 'https://oracle.example/api/oracle' }), 'https://oracle.example/api/oracle');
+  for (const url of ['http://evil.example/api', 'https://user:secret@example.com/api', 'https://example.com/api?key=secret', 'javascript:alert(1)', 'https://example.com/api#token']) assert.equal(oracleEndpoint({ VITE_ORACLE_URL: url }), null);
+});
+
+test('Oracle permits configured CORS preflights, rejects unknown origins, and still requires authentication', async () => {
+  const handler = createOracleHandler({ env: { ...env, ORACLE_ALLOWED_ORIGINS: 'https://yapox.github.io' }, database });
+  const response = await call(handler, { method: 'OPTIONS', headers: { origin: 'https://yapox.github.io' } });
+  assert.equal(response.statusCode, 204);
+  assert.equal(response.headers['Access-Control-Allow-Origin'], 'https://yapox.github.io');
+  assert.equal(response.headers['Access-Control-Allow-Headers'], 'Authorization, Content-Type');
+  assert.equal((await call(handler, { method: 'OPTIONS', headers: { origin: 'https://unknown.example' } })).statusCode, 403);
+  assert.equal((await call(handler, { headers: { origin: 'https://yapox.github.io' } })).statusCode, 401);
+  assert.equal((await call(handler, { headers: { origin: 'https://oracle.example', host: 'oracle.example' } })).statusCode, 401);
 });
