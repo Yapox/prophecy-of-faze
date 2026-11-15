@@ -4,7 +4,8 @@ import { createPractice, loadPractice, PRACTICE_KEY, purchasePractice, settlePra
 
 const pendingKey = id => `faze-pending-purchase:${id}`;
 function browserStorage() { try { return window.localStorage; } catch { return null; } }
-function initialMode() { try { return browserStorage()?.getItem('faze-mode') === 'demo' || !isConfigured ? 'demo' : 'live'; } catch { return isConfigured ? 'live' : 'demo'; } }
+// A saved practice preference must not hide the connected backend on return.
+function initialMode() { return isConfigured ? 'live' : 'demo'; }
 function storedPending(id) {
   try {
     const parsed = JSON.parse(window.sessionStorage.getItem(pendingKey(id)) || 'null');
@@ -15,11 +16,11 @@ function storedPending(id) {
 export default function useArena() {
   const [mode, setModeState] = useState(initialMode);
   const [practice, setPractice] = useState(() => loadPractice(browserStorage()));
-  const [preview] = useState(() => createPractice());
   const [session, setSession] = useState(null);
   const [ready, setReady] = useState(!isConfigured);
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [updatedAt, setUpdatedAt] = useState(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [pendingState, setPendingState] = useState(null);
@@ -29,47 +30,75 @@ export default function useArena() {
   const operation = useRef(false);
   const practiceRef = useRef(practice);
   const requestGeneration = useRef(0);
+  const refreshesInFlight = useRef(0);
   const userId = session?.user.id || null;
   identity.current.mode = mode;
-  const data = mode === 'demo' ? practice : accountData?.user.id === userId ? accountData : userId
-    ? { user: { id: userId }, matches: [], markets: [], wallet: { balance: 0 }, positions: [], history: [], leaderboard: [] }
-    : preview;
+  const data = mode === 'demo' ? practice : userId && accountData?.user.id === userId ? accountData
+    : { user: { id: userId }, matches: [], markets: [], wallet: { balance: 0 }, positions: [], history: [], leaderboard: [] };
   const pending = mode === 'live' && pendingState?.userId === userId ? pendingState : null;
 
   useEffect(() => {
     if (!supabase) return;
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, next) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
       const nextId = next?.user.id || null;
       if (identity.current.id !== nextId) {
         identity.current.id = nextId;
         requestGeneration.current++;
-        setAccountData(null); setPendingState(null); setError(''); setTradeMessage(''); setLoading(false);
+        setAccountData(null); setUpdatedAt(null); setPendingState(null); setError(''); setTradeMessage(''); setLoading(false);
+        if (nextId && event === 'SIGNED_IN') {
+          identity.current.mode = 'live';
+          setModeState('live');
+        }
       }
       setSession(next); setReady(true);
     });
     return () => subscription.unsubscribe();
   }, []);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (options = {}) => {
     if (mode !== 'live' || !userId) return;
+    if (options.background && refreshesInFlight.current) return;
     const generation = ++requestGeneration.current;
+    refreshesInFlight.current++;
     setLoading(true); setError('');
     try {
       const result = await loadDashboard();
-      if (generation === requestGeneration.current && identity.current.id === userId && identity.current.mode === 'live') setAccountData(result);
+      if (generation === requestGeneration.current && identity.current.id === userId && identity.current.mode === 'live') {
+        setAccountData(result); setUpdatedAt(Date.now());
+      }
     } catch {
       if (generation === requestGeneration.current) setError('Account data could not be refreshed. Check your connection and try again. A confirmed purchase remains confirmed.');
-    } finally { if (generation === requestGeneration.current) setLoading(false); }
+    } finally {
+      refreshesInFlight.current--;
+      if (generation === requestGeneration.current) setLoading(false);
+    }
   }, [mode, userId]);
 
   useEffect(() => { if (userId) setPendingState(storedPending(userId)); }, [userId]);
   useEffect(() => { if (mode === 'live' && userId) refresh(); }, [mode, userId, refresh]);
+  useEffect(() => {
+    if (mode !== 'live' || !userId) return;
+    const sync = () => {
+      if (document.visibilityState !== 'hidden') refresh({ background: true });
+    };
+    // The backend does not publish Realtime events. Re-read its authoritative
+    // records while visible, on returning to the tab, and after reconnecting.
+    const timer = window.setInterval(sync, 30_000);
+    window.addEventListener('focus', sync);
+    window.addEventListener('online', sync);
+    document.addEventListener('visibilitychange', sync);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('focus', sync);
+      window.removeEventListener('online', sync);
+      document.removeEventListener('visibilitychange', sync);
+    };
+  }, [mode, userId, refresh]);
 
   function setMode(next) {
     if (operation.current) return;
     identity.current.mode = next; requestGeneration.current++;
     setModeState(next); setTradeMessage(''); setError(''); setLoading(false);
-    try { browserStorage()?.setItem('faze-mode', next); } catch { /* Mode remains usable for this session. */ }
   }
 
   function commitPractice(next) {
@@ -136,8 +165,8 @@ export default function useArena() {
     if (cause) setError('Sign-out failed. Please try again.');
   }
 
-  return { mode, setMode, data, session, ready, loading, error, notice, setNotice, pending, busy,
+  return { mode, setMode, data, session, ready, loading, updatedAt, error, notice, setNotice, pending, busy,
     tradeMessage, setTradeMessage, refresh, purchase, resolvePractice, resetPractice, signOut,
     authenticated: mode === 'live' && Boolean(userId), accountLoaded: mode === 'demo' || Boolean(accountData?.user.id === userId && userId),
-    sample: mode === 'demo' || !userId };
+    sample: mode === 'demo' };
 }

@@ -28,6 +28,9 @@ try {
   await act(async () => { root.render(createElement(App)); });
   assert.match(document.body.textContent, /Predict the Game/);
   assert.match(document.body.textContent, /Ithaca/);
+  // Configured projects open account mode. Practice is an explicit action.
+  const practiceButton = [...document.querySelectorAll('button')].find(button => button.textContent === 'Try practice mode');
+  if (practiceButton) await click(practiceButton);
   assert.equal(document.querySelectorAll('.hero .market-card').length, 1);
   await click(document.querySelector('.hero .yes-button'));
   assert.equal(document.querySelector('dialog').open, true);

@@ -9,7 +9,20 @@ Object.assign(globalThis, { window: dom.window, document: dom.window.document, H
 Object.defineProperty(globalThis, 'navigator', { value: dom.window.navigator, configurable: true });
 globalThis.BroadcastChannel = undefined;
 window.scrollTo = () => {};
-window.localStorage.setItem('faze-mode', 'live');
+// Old saved preferences must not keep users on sample fixtures.
+window.localStorage.setItem('faze-mode', 'demo');
+Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+let syncTimer, syncTimerCleared = false;
+const originalSetInterval = window.setInterval.bind(window);
+const originalClearInterval = window.clearInterval.bind(window);
+window.setInterval = (callback, delay, ...args) => {
+  if (delay === 30_000) { syncTimer = callback; return 987654; }
+  return originalSetInterval(callback, delay, ...args);
+};
+window.clearInterval = id => {
+  if (id === 987654) { syncTimerCleared = true; return; }
+  originalClearInterval(id);
+};
 window.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
 window.HTMLDialogElement.prototype.close = function () { this.open = false; };
 const { createElement, act } = await import('react');
@@ -32,11 +45,11 @@ const tables = {
   wallets: [{ user_id: user.id, balance: 1000 }], prediction_positions: [],
   wallet_transactions: [{ id: 'bonus', user_id: user.id, kind: 'signup_bonus', amount: 1000, balance_after: 1000, created_at: new Date().toISOString() }],
 };
-let authCallback, currentUser = user, purchaseCalls = [], loseFirstResponse = true;
+let authCallback, currentUser = null, purchaseCalls = [], loseFirstResponse = true, matchReads = 0;
 supabase.auth.getUser = async () => ({ data: { user: currentUser }, error: null });
 supabase.auth.onAuthStateChange = callback => {
   authCallback = callback;
-  queueMicrotask(() => callback('INITIAL_SESSION', { user }));
+  queueMicrotask(() => callback('INITIAL_SESSION', null));
   return { data: { subscription: { unsubscribe() {} } } };
 };
 supabase.auth.signOut = async () => { currentUser = null; authCallback('SIGNED_OUT', null); return { error: null }; };
@@ -48,6 +61,7 @@ supabase.from = table => {
     range(first, last) { start = first; end = last; return this; },
     eq(column, value) { filters.push([column, value]); return this; }, single() { single = true; return this; },
     then(resolve, reject) {
+      if (table === 'matches') matchReads++;
       let rows = tables[table].filter(row => filters.every(([key, value]) => row[key] === value)).slice(start, end + 1);
       rows = rows.map(row => Object.fromEntries(columns.map(column => [column, row[column]])));
       return Promise.resolve({ data: single ? rows[0] : rows, error: null }).then(resolve, reject);
@@ -81,6 +95,10 @@ async function navigate(page) {
 try {
   const { default: App } = await server.ssrLoadModule('/src/OdysseyApp.jsx');
   await act(async () => root.render(createElement(App)));
+  assert.match(document.body.textContent, /Sign in to see live FaZe matches/);
+  assert.equal(document.querySelectorAll('.market-card').length, 0, 'Signed-out account mode must not substitute sample fixtures');
+  assert.equal(matchReads, 0, 'Do not query protected rows before sign-in');
+  await act(async () => { currentUser = user; authCallback('SIGNED_IN', { user }); });
   const cards = [...document.querySelectorAll('.market-card')];
   assert.equal(cards.length, 2);
   for (const [index, opponent] of ['fnatic', 'Wildcard'].entries()) {
@@ -89,7 +107,22 @@ try {
     assert.match(cards[index].querySelector('.data-label').textContent, /PandaScore/);
     assert.equal(cards[index].querySelector('.yes-button').disabled, false);
   }
-  await click(cards[0].querySelector('.yes-button'));
+  const initialReads = matchReads;
+  tables.prediction_markets[0].question += ' Best of three.';
+  await act(async () => window.dispatchEvent(new window.Event('focus')));
+  assert.ok(matchReads > initialReads);
+  assert.match(document.querySelector('.market-card').textContent, /Best of three/);
+  const focusReads = matchReads;
+  Object.defineProperty(document, 'visibilityState', { value: 'hidden', configurable: true });
+  await act(async () => syncTimer());
+  assert.equal(matchReads, focusReads, 'Hidden tabs do not poll');
+  Object.defineProperty(document, 'visibilityState', { value: 'visible', configurable: true });
+  await act(async () => syncTimer());
+  assert.ok(matchReads > focusReads, 'Visible tabs poll updated backend records');
+  const pollReads = matchReads;
+  await act(async () => window.dispatchEvent(new window.Event('online')));
+  assert.ok(matchReads > pollReads, 'Reconnect refreshes account records');
+  await click(document.querySelector('.market-card .yes-button'));
   await click(document.querySelector('dialog form .button-primary'));
   assert.match(document.querySelector('dialog').textContent, /outcome is uncertain/);
   assert.equal(tables.wallets[0].balance, 900);
@@ -120,11 +153,38 @@ try {
   await click(document.querySelector('dialog .icon-button'));
   await navigate('leaderboard');
   assert.match(document.body.textContent, /1,000 coins/);
+  // A backend import arriving after initial load appears without a page reload.
+  await navigate('markets');
+  const addedMatch = { ...matches[0], id: '00000000-0000-0000-0000-000000000013', opponent: 'New fixture opponent', external_reference: 'pandascore:match:9999999', starts_at: future(24) };
+  tables.matches.push(addedMatch);
+  tables.prediction_markets.push({ ...tables.prediction_markets[1], id: '00000000-0000-0000-0000-000000000023', match_id: addedMatch.id, question: 'Will FaZe Clan beat New fixture opponent?', closes_at: future(23) });
+  await act(async () => syncTimer());
+  assert.equal(document.querySelectorAll('.market-card').length, 3);
+  assert.match(document.body.textContent, /Will FaZe Clan beat New fixture opponent/);
+  // Settlement data is read from the backend, never calculated into its wallet.
+  tables.prediction_markets[0].status = 'resolved';
+  tables.prediction_markets[0].winning_side = 'YES';
+  tables.wallets[0].balance = 1000;
+  tables.wallet_transactions.push({ id: 'controlled-payout', user_id: user.id, position_id: tables.prediction_positions[0].id, kind: 'prediction_payout', amount: 200, balance_after: 1000, created_at: new Date().toISOString() });
+  await act(async () => window.dispatchEvent(new window.Event('focus')));
+  assert.equal(document.querySelectorAll('.market-card').length, 2, 'Resolved market leaves the open list');
+  assert.match(document.querySelector('.wallet-pill').textContent, /1,000/);
+  await navigate('portfolio');
+  await click([...document.querySelectorAll('.portfolio-tabs button')].find(button => button.textContent === 'Settled positions'));
+  assert.match(document.querySelector('tbody').textContent, /YES won/);
+  assert.match(document.querySelector('tbody').textContent, /\+100 coins/);
   await click([...document.querySelectorAll('header button')].find(button => button.textContent === 'Sign out'));
   assert.doesNotMatch(document.body.textContent, /Test predictor/);
   assert.equal(document.querySelector('.wallet-pill'), null);
+  assert.equal(syncTimerCleared, true, 'Sign-out cleans up automatic refresh');
+  await navigate('markets');
+  assert.equal(document.querySelectorAll('.market-card').length, 0, 'Sign-out never replaces backend records with samples');
+  const signedOutReads = matchReads;
+  await act(async () => window.dispatchEvent(new window.Event('focus')));
+  assert.equal(matchReads, signedOutReads, 'Sign-out removes the focus refresh listener');
   console.log('PASS: account-mode DOM renders both imported-question fixtures, buys YES and NO, retries a lost response without a duplicate debit, refreshes the wallet/portfolio/leaderboard, and clears private data on logout.');
   console.log('Controlled Supabase responses only. UUIDs/dates are synthetic; no deployed rows were read and no live coins were spent.');
+  console.log('PASS: saved practice preference cannot hide account mode; signed-out mode has no sample fallback; focus, visible polling, reconnect, and sign-out cleanup work.');
 } finally {
   await act(async () => root.unmount());
   await supabase.auth.stopAutoRefresh();

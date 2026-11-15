@@ -9,7 +9,7 @@ React frontend for the virtual coin prediction backend in `supabase/migrations`.
 3. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` to the Supabase project URL and **public publishable key**. Never put a service role key or database password in a Vite variable.
 4. Run `npm run dev` and open the URL shown by Vite.
 
-The Supabase migration must already be applied to the project. Sign up or sign in before loading matches and markets. If email confirmation is enabled, confirm the account before signing in. Matches and markets are created by a trusted backend; the browser only reads them. An empty match list means none have been published yet.
+The Supabase migration must already be applied to the project. Sign up or sign in before loading matches and markets. If email confirmation is enabled, confirm the account before signing in. Matches and markets are created by a trusted backend; the browser only reads them. Sign-in, loading, fetch errors, and empty results have separate states.
 
 The frontend supports sign-up, sign-in, wallet balance, matches, YES/NO purchases, safe retries with the same request ID, recent transactions, and the leaderboard. Purchases use virtual coins with no cash value. Pending purchase intent is kept in per-user session storage so a lost response can be retried without a second debit.
 
@@ -24,6 +24,8 @@ The navigation includes Home, Markets, Portfolio, Leaderboard, The Oracle, and d
 Practice mode stores seeded fixtures, positions, ledger entries, and a 1,000-coin starting wallet in this browser’s local storage. Practice and account data are separate. Portfolio includes tools to resolve or cancel sample fixtures and reset the practice wallet. Sample schedules, teams’ participation, and event names do not claim to represent real fixtures. Leaderboard practice mode contains only the current practice user.
 
 Account mode uses the configured Supabase project. Email confirmation is enabled in the currently connected project. After confirmation, sign in here to load account data. In Supabase Auth URL settings, allow the local origin you use (`http://127.0.0.1:5173` or `http://localhost:5173`) and your deployed Vercel origin. Never reset an existing account wallet to repeat a test.
+
+Configured projects open account mode by default. Sample matches appear only when practice is explicitly selected. Signed-in records refresh every 30 seconds while visible, on focus/visibility/reconnect, and after purchases. The account notice displays the last successful sync time. PandaScore imports and trusted-backend settlements appear through these database reads; the frontend does not run import or settlement tools.
 
 ## The Oracle and Vercel
 
@@ -40,6 +42,7 @@ Implementation references: [Tailwind’s Vite integration](https://tailwindcss.c
 - `npm test`: trade calculations, retries, settlement/refunds, ledger reconciliation, storage fallback, and Oracle authorization/data minimization with a mocked provider.
 - `npm run check:render`: the app and representative market card render through Vite.
 - `npm run check:flow`: a DOM-based practice journey covering a duplicate confirm click, wallet debit, portfolio, winning settlement, transaction history, leaderboard, game filtering, and legal navigation.
+- `npm run check:account`: controlled Supabase responses covering sign-in gating, automatic refresh, newly imported cards, purchases/retries, wallet updates, resolved positions, and logout cleanup. This does not read or modify deployed records.
 - `npm run build`: production compilation.
 
 The public Supabase key was accepted by the deployed Auth settings endpoint. Signed-in signup/purchase/payout checks still require an email-confirmed test account. Desktop/mobile screenshots, visual overflow checks, and keyboard interaction in a real browser have not been completed because browser automation is unavailable. DOM tests do not substitute for that visual inspection.
