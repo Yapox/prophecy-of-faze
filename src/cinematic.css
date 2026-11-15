@@ -156,3 +156,24 @@ th { background: #1c1e1d; }
   .odyssey-art, .odyssey-wave-layer { transform: none !important; opacity: .13 !important; will-change: auto; }
 }
 .auth-recovery-link { display: block; margin-top: 16px; }
+.activity-section { margin-top: 64px; }
+.activity-summary { display: flex; flex-wrap: wrap; gap: 28px 56px; margin: 24px 0; }
+.activity-summary dt { color: var(--muted); font-size: .8rem; }
+.activity-summary dd { margin: 8px 0 0; font-size: 1.65rem; }
+.activity-week { list-style: none; padding: 0; margin: 26px 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--border); }
+.activity-week li { min-width: 0; padding: 16px 8px; text-align: center; border-right: 1px solid var(--border); }
+.activity-week li:last-child { border-right: 0; }
+.activity-week time { display: block; font-size: .8rem; }
+.activity-week span { display: block; margin-top: 8px; color: var(--muted); font-size: .65rem; }
+.activity-week .day-active { background: #28231a; }
+.activity-week .day-active span { color: var(--accent); }
+.activity-week [aria-current="date"] time { text-decoration: underline; text-underline-offset: 5px; }
+.daily-goals h3 { font-size: 1.1rem; }
+.daily-goal { display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); padding: 20px 0; }
+.daily-goal p { color: var(--muted); font-size: .85rem; margin: 8px 0 0; }
+.daily-goal > span { flex-shrink: 0; font-size: .8rem; }
+@media (max-width: 640px) {
+  .activity-week { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .activity-week li { border-bottom: 1px solid var(--border); }
+  .activity-summary { gap: 24px; }
+}
