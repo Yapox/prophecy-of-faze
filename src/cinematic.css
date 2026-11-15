@@ -26,12 +26,13 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .skip-link:not(:focus) { clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; white-space: nowrap; padding: 0; }
 .utility-bar { background: #141619; }
 .site-header { position: relative; z-index: 2; }
-.brand-monogram { border-color: #806b44; }
+.brand-monogram { border-color: var(--faze-red-border); color: var(--crimson); background: #382326; }
+.main-nav a[aria-current=page], .portfolio-tabs button[aria-pressed=true] { border-bottom-color: var(--faze-red); }
 .mode-notice { color: #c9c5ba; background: #202422; }
 .featured-market { box-shadow: none; }
 .hero-product:before { border-color: #67573a; }
 .team-seal { background: #202320; border-color: #54554b; color: #e2ddcc; }
-.team-seal.faze-seal { background: #28191a; border-color: #694044; color: #e0a09b; }
+.team-seal.faze-seal { background: #382326; border-color: #994a50; color: #f0a29a; }
 .contract-button { color: #d3dfc6; background: #222c22; border-color: #53604b; }
 .contract-button.no-button { color: #e8c9c3; background: #302121; border-color: #74514b; }
 .versus { color: var(--muted); }
@@ -109,6 +110,24 @@ th { background: #1c1e1d; }
 .destination-note { grid-column: 1 / -1; padding-top: 70px; margin: 0; max-width: 530px; color: var(--muted); font-size: .64rem; }
 .chapter-content > * { min-width: 0; }
 .source-indicator { display: inline-block; flex-shrink: 0; width: 9px; height: 9px; margin: 5px; border-radius: 50%; background: #75ce91; outline: 3px solid #75ce911c; }
+/* Focus and hover share the same visual cues; only fine pointers receive lift. */
+.button, .contract-button, .market-card, .landing-trade-panel, .main-nav a, .text-link, .brand-monogram, .filter-tabs button { transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease; }
+.market-card:focus-within, .landing-trade-panel:focus-within { border-color: var(--faze-red-border); }
+.button-primary:focus-visible, .button-gold:focus-visible { background: var(--faze-red); border-color: var(--faze-red); color: #fff4ec; }
+.button-secondary:focus-visible { border-color: var(--faze-red-border); background: #35272a; }
+.text-link:focus-visible { color: var(--crimson); }
+@media (hover: hover) and (pointer: fine) {
+  .button-primary:hover:not(:disabled), .button-gold:hover:not(:disabled) { background: var(--faze-red); border-color: var(--faze-red); color: #fff4ec; transform: translateY(-2px); }
+  .button-secondary:hover:not(:disabled) { background: #35272a; border-color: var(--faze-red-border); transform: translateY(-2px); }
+  .main-nav a:hover { color: var(--color-ink); border-bottom-color: var(--crimson); }
+  .text-link:hover:not(:disabled) { color: var(--crimson); }
+  .brand:hover .brand-monogram { background: #50282e; border-color: var(--crimson); }
+  .market-card:hover { border-color: var(--faze-red-border); transform: translateY(-3px); }
+  .landing-trade-panel:hover { border-color: var(--faze-red-border); }
+  .contract-button.yes-button:hover:not(:disabled) { background: #2c3b2e; border-color: #83ae88; }
+  .contract-button.no-button:hover:not(:disabled) { background: #42282c; border-color: #ce6968; }
+  .filter-tabs button:hover { color: var(--color-ink); border-color: var(--faze-red-border); }
+}
 @media (max-width: 1050px) {
   .cinematic-hero > .chapter-content { gap: 35px; }
   .cinematic-hero h1 { font-size: 4.4rem; }
@@ -158,6 +177,7 @@ th { background: #1c1e1d; }
 @media (prefers-reduced-motion: reduce) {
   .odyssey-art, .odyssey-wave-layer { transform: none !important; opacity: .28 !important; will-change: auto; }
   .chapter-content { transform: none !important; opacity: 1 !important; }
+  .button, .market-card { transform: none !important; }
 }
 .auth-recovery-link { display: block; margin-top: 16px; }
 .auth-recovery-form > .button-primary { margin-top: 18px; }
