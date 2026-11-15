@@ -14,7 +14,7 @@ Repository Actions variables:
 | --- | --- |
 | `VITE_SUPABASE_URL` | Public Supabase project URL. Already configured. |
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Public client key. Already configured. |
-| `VITE_ORACLE_URL` | Optional HTTPS Oracle endpoint, e.g. the actual Vercel domain followed by `/api/oracle`. |
+| `VITE_ORACLE_URL` | `https://gkhzdoqpqjutuonysdpw.supabase.co/functions/v1/oracle`, set after function deployment. |
 
 Variable changes require a new Pages build. Do not put private keys in any `VITE_` variable.
 
@@ -31,21 +31,37 @@ Add the corresponding exact URLs for a separate full-app deployment or local tes
 
 ## Oracle server
 
-Import `Yapox/prophecy-of-faze` into Vercel using the existing `vercel.json`. The build command is `npm run build`, output `dist`, Node 22. Do not set `VITE_STATIC_HOSTING=true` on Vercel. This deployment serves both the app and `/api/oracle`.
+Use the existing Supabase project `gkhzdoqpqjutuonysdpw`. The frontend stays on GitHub Pages; no Vercel deployment is needed. The Edge Function lives at `supabase/functions/oracle/index.ts`. It shares its implementation with the Node adapter at `api/oracle.js`, so local Vite development still works.
 
-Configure privately in Vercel:
+1. In [Supabase Edge Function Secrets](https://supabase.com/dashboard/project/gkhzdoqpqjutuonysdpw/functions/secrets), save `GEMINI_API_KEY` privately. Do not paste it into chat, Git, or a `VITE_` variable.
+2. Authenticate the CLI using an account with deployment access, then deploy only this function. The commands below use Supabase CLI 3.1.0; Docker is not needed with `--use-api`.
+
+```powershell
+npx --yes supabase@3.1.0 login
+npx --yes supabase@3.1.0 functions deploy oracle --remote=gkhzdoqpqjutuonysdpw --use-api --yes
+```
+
+`supabase/config.toml` leaves platform JWT verification enabled. The handler verifies the token again through `auth.getUser` and uses that token for database reads. Never pass `--no-verify-jwt` to work around an authentication error.
+
+3. Check that an `OPTIONS` request from `https://yapox.github.io` returns 204 with the exact allowed origin. A request without a valid user token must not return an AI reply.
+4. Set repository Actions variable `VITE_ORACLE_URL` to `https://gkhzdoqpqjutuonysdpw.supabase.co/functions/v1/oracle` and run the Pages deployment workflow again. Set this only after the function is deployed and configured.
+5. Sign in on the published site, select a real match in The Oracle, ask a question and a follow-up, and verify successful replies. A controlled test is not a substitute for this check.
+
+Production function environment:
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `VITE_SUPABASE_URL` | Yes | Frontend public project URL; server fallback. |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Yes | Frontend public key; server fallback. |
+| `SUPABASE_URL` | Injected | Supabase supplies the project URL. |
+| `SUPABASE_PUBLISHABLE_KEYS` | Injected | Public keys JSON; the function uses `default`, with `SUPABASE_ANON_KEY` fallback for legacy projects. |
 | `GEMINI_API_KEY` | Yes | Private Gemini credential. |
 | `GEMINI_MODEL` | Optional | Defaults to `gemini-3.5-flash-lite`; confirm availability for the provider project. |
-| `ORACLE_ALLOWED_ORIGINS` | For Pages | `https://yapox.github.io` permits the existing Pages frontend. Additional exact origins may be comma separated. |
+| `ORACLE_ALLOWED_ORIGINS` | Optional | Defaults to `https://yapox.github.io`. Override with comma-separated exact origins if needed. |
 | `PANDASCORE_API_TOKEN` | For result samples | Private provider token. Chat still works without the sample. |
 | `ORACLE_DURABLE_RATE_LIMIT` | After migration | Set `true` after the migration below is applied. |
 
-Set the actual HTTPS server endpoint in GitHub's `VITE_ORACLE_URL`, then rebuild Pages. Browser requests use a Supabase bearer token and explicit CORS. No private Gemini/PandaScore/service-role key reaches the frontend.
+Do not manually set Supabase-reserved environment names. Browser requests use a Supabase bearer token, public publishable key and explicit CORS. No private Gemini/PandaScore/service-role key reaches the frontend. Supabase deployment access is separate from the public key used by the website.
+
+If the CLI reports `AccessTokenRequiredError`, run `supabase login` on the same machine. A backend owner can also run the deployment commands from their checkout. If the handler returns 503 for missing server configuration, check the private Gemini secret in Supabase. Do not resolve that error by adding a private key to the React build.
 
 The result sample inspects at most 200 recent CS2 fixture records, validates explicit winners and scores, and returns at most five results for each identifiable team. It is not complete form or a probability. Player performance statistics require separately authorized provider coverage and are not implemented. Do not purchase an API upgrade merely to activate this sample.
 

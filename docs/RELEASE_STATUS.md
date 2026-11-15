@@ -6,7 +6,7 @@
 | Signup and login | Implemented | Temporary admin-confirmed account received exactly 1,000 coins; browser login, session persistence and logout passed. Public signup email delivery remains unverified. |
 | Password recovery | Implemented | Controlled form/event tests pass; email delivery and redirect allowlist need live verification. |
 | Prediction streaks and daily goals | Implemented from prediction records, using UTC | No bonus-currency writes or new account permissions. |
-| Oracle chat | Implemented, including separate HTTPS endpoint support | Gemini key and server host are not available in this workspace. Pages displays an unavailable notice until configured. |
+| Oracle chat | Supabase Edge Function and shared Node handler implemented; Deno check and controlled chat tests pass | Supabase deployment login and private Gemini secret are pending. Pages endpoint activation and a real signed-in Gemini reply remain unverified. |
 | Recent performance context | Validated, sourced PandaScore result samples | Live provider read succeeded; the bounded 200-fixture sample contained no qualifying FaZe/fnatic results. No player statistics or full historical coverage claimed. |
 | Automated fixtures and questions | Atomic RPC, scheduler and CLI implemented | Read-only schema check confirmed the new functions/ledger are absent. Dry-run found the two real upcoming fixtures. Apply remains disabled. |
 | Automated payouts | Existing validation plus audited payout wrapper | Migration and apply control pending. Special outcomes require operator review. |

@@ -2,7 +2,9 @@
 
 ## Current hosting and optional provider context
 
-The frontend is published on GitHub Pages. The server endpoint needs a separate Node deployment and private Gemini configuration. Set Pages `VITE_ORACLE_URL` to the actual HTTPS server `/api/oracle` URL and server `ORACLE_ALLOWED_ORIGINS=https://yapox.github.io`. See [DEPLOYMENT.md](DEPLOYMENT.md) for exact settings and activation steps. Without a configured endpoint, Pages displays an unavailable notice.
+The frontend is published on GitHub Pages. The Oracle runs in the existing Supabase project as `supabase/functions/oracle/index.ts`, sharing its request handler with the local Node endpoint. No Vercel account is required. Set `GEMINI_API_KEY` privately in Supabase's Edge Function secrets, deploy `oracle`, then configure Pages `VITE_ORACLE_URL=https://gkhzdoqpqjutuonysdpw.supabase.co/functions/v1/oracle`. The function permits `https://yapox.github.io` by default. See [DEPLOYMENT.md](DEPLOYMENT.md#oracle-server) for commands and activation checks. Without a configured endpoint, Pages displays an unavailable notice.
+
+Supabase's platform JWT verification remains enabled. The handler also verifies the user through Supabase Auth and reads match records through that user's database permissions. Browser requests include the user's bearer token and public publishable key. The Edge Function reads Supabase-injected public keys, with a legacy anon-key fallback; it does not use a service-role key.
 
 When server `PANDASCORE_API_TOKEN` is present, CS2 questions may include a validated, bounded recent-result sample from PandaScore. The source panel displays results, sample counts, retrieval time, and coverage limits. No player performance statistics or win probability is supplied. Missing provider context never becomes invented model facts. The client timeout is now 40 seconds, allowing provider reads plus the 20-second Gemini timeout.
 
@@ -16,11 +18,11 @@ After applying the new migration, enable `ORACLE_DURABLE_RATE_LIMIT=true` for sh
 4. Restart `npm run dev` after changing environment variables. Sign in with an email-confirmed account, then open `#oracle` and choose a published market.
 5. Ask a question, then a follow-up. The second request includes recent successful chat turns. Switching markets, signing out, leaving the page, or choosing New chat clears the conversation.
 
-For Vercel, configure the same server environment variables and public Supabase variables in the deployment settings, then redeploy. No deployment is performed by these changes.
+For Supabase production, follow the deployment steps above. Local Vite development continues to use `/api/oracle`. The Node adapter and `vercel.json` remain available for optional Node hosting.
 
 ## Data flow
 
-React sends `{ marketId, message, history }` to `POST /api/oracle` with the Supabase session bearer token. The endpoint verifies the user, reads the selected market and match through the user's database permissions, and calls Gemini's [generateContent API](https://ai.google.dev/api/generate-content). It supplies current match context, contract rules, and validated `user`/`model` conversation contents.
+React sends `{ marketId, message, history }` to the configured Oracle URL with the Supabase session bearer token and public `apikey` header. In production this is `POST /functions/v1/oracle`; local Vite uses `POST /api/oracle`. The shared handler verifies the user, reads the selected market and match through the user's database permissions, and calls Gemini's [generateContent API](https://ai.google.dev/api/generate-content). It supplies current match context, contract rules, and validated `user`/`model` conversation contents.
 
 The app does not attach email, wallet, position history, or session credentials to the Gemini payload. User questions and previous messages are sent to Gemini, so personal information typed by users will be included. The app stores no chat rows or browser-storage transcript. Provider and hosting data handling still requires launch review; this does not assert that external providers retain nothing.
 
@@ -30,8 +32,9 @@ The server uses five requests per user per minute per process. Enabling the opti
 
 ## Verification
 
-- `npm test`: conversation validation, authentication/market-access guards, server model selection, provider quotas/empty replies, rate limiting, and account-data exclusion.
+- `npm test`: conversation validation, authentication/market-access guards, server model selection, provider quotas/empty replies, rate limiting, account-data exclusion, native Edge requests/CORS, and bounded streamed bodies.
 - `npm run check:chat`: the actual React chat, API helper, and endpoint with controlled provider/database responses. Covers sign-in, suggestions, follow-ups, duplicate protection, failed-question retry, New chat, changing markets during a request, stale-response rejection, and practice/logout behavior.
 - `npm run build`: production frontend compilation.
+- `npx --yes deno check --config supabase/functions/oracle/deno.json supabase/functions/oracle/index.ts`: check the Supabase entry point and its dependencies in Deno.
 
-These controlled checks make no live Gemini requests or Supabase changes. The published frontend has since been inspected in headless Chromium, and live account integration passed separately. A live PandaScore read also succeeded, although the bounded 200-fixture sample contained no qualifying FaZe/fnatic results. The Oracle endpoint/key remains unconfigured, so an actual signed-in Gemini reply is still unverified. See [release status](RELEASE_STATUS.md).
+These controlled checks make no live Gemini requests or Supabase changes. The published frontend has since been inspected in headless Chromium, and live account integration passed separately. A live PandaScore read also succeeded, although the bounded 200-fixture sample contained no qualifying FaZe/fnatic results. The Supabase Edge Function is prepared and Deno-checked; live deployment needs a Supabase CLI login and the private Gemini secret. An actual signed-in Gemini reply is still unverified. See [release status](RELEASE_STATUS.md).

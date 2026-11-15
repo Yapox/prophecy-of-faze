@@ -42,6 +42,7 @@ function reply(text) { return { ok: true, json: async () => ({ candidates: [{ co
 const originalFetch = globalThis.fetch;
 globalThis.fetch = async (url, options) => {
   assert.equal(url, '/api/oracle', 'DOM test must never call an external service');
+  assert.equal(options.headers.apikey, 'sb_publishable_chat_test');
   const body = JSON.parse(options.body);
   assert.doesNotMatch(options.body, /server-key-only|not-for-gemini@example/);
   requests.push(body);

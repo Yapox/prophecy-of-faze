@@ -99,15 +99,15 @@ export async function askOracle(marketId, message, history = [], { signal } = {}
   if (!session) throw new Error('Sign in to use The Oracle.');
   const response = await fetch(oracleUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}`, apikey: key },
     body: JSON.stringify({ marketId, message, history }),
     signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(40_000)]) : AbortSignal.timeout(40_000),
   });
   if (!response.headers.get('content-type')?.includes('application/json')) {
-    throw new Error('The Oracle endpoint is unavailable. Run the Vercel server or deploy the project with server environment variables.');
+    throw new Error('The Oracle server is unavailable. Please try again later.');
   }
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error || 'The Oracle could not respond. Please try again.');
+  if (!response.ok) throw new Error(typeof result.error === 'string' ? result.error : result.code === 'NOT_FOUND' ? 'The Oracle server has not been deployed yet.' : 'The Oracle could not respond. Please try again.');
   if (typeof result.text !== 'string' || !result.text.trim()) throw new Error('The Oracle returned an empty reply. Please try again.');
   return result;
 }

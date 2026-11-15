@@ -1,0 +1,7 @@
+project_id = "prophecy-of-faze"
+
+[functions.oracle]
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/oracle/index.ts"
+import_map = "./functions/oracle/deno.json"

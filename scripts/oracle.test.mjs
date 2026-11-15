@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createOracleHandler, MAX_ORACLE_BODY_BYTES } from '../api/oracle.js';
 import { oracleEndpoint } from '../src/oracleEndpoint.js';
+import { createOracleFetchHandler } from '../supabase/functions/_shared/oracle.js';
 
 const marketId = '00000000-0000-0000-0000-000000000001';
 const env = { SUPABASE_URL: 'https://example.supabase.co', SUPABASE_PUBLISHABLE_KEY: 'public-test-key', GEMINI_API_KEY: 'server-test-key', GEMINI_MODEL: 'test-model' };
@@ -132,7 +133,7 @@ test('Oracle permits configured CORS preflights, rejects unknown origins, and st
   const response = await call(handler, { method: 'OPTIONS', headers: { origin: 'https://yapox.github.io' } });
   assert.equal(response.statusCode, 204);
   assert.equal(response.headers['Access-Control-Allow-Origin'], 'https://yapox.github.io');
-  assert.equal(response.headers['Access-Control-Allow-Headers'], 'Authorization, Content-Type');
+  assert.equal(response.headers['Access-Control-Allow-Headers'], 'Authorization, Content-Type, apikey, x-client-info');
   assert.equal((await call(handler, { method: 'OPTIONS', headers: { origin: 'https://unknown.example' } })).statusCode, 403);
   assert.equal((await call(handler, { headers: { origin: 'https://yapox.github.io' } })).statusCode, 401);
   assert.equal((await call(handler, { headers: { origin: 'https://oracle.example', host: 'oracle.example' } })).statusCode, 401);
@@ -145,4 +146,41 @@ test('durable Oracle quota fails closed before provider requests', async () => {
     assert.equal((await call(handler)).statusCode, expected);
     assert.equal(calls, 0);
   }
+});
+
+test('Edge handler accepts Web Requests, allows the Pages preflight, and forwards only verified match context', async () => {
+  let providerCalls = 0;
+  const handler = createOracleFetchHandler({
+    env: { ...env, ORACLE_ALLOWED_ORIGINS: 'https://yapox.github.io' }, database,
+    fetchImpl: async (_url, options) => {
+      providerCalls++;
+      assert.doesNotMatch(options.body, /private-session-token|private@example/);
+      return Response.json({ candidates: [{ content: { parts: [{ text: 'YES predicts a FaZe win.' }] } }] });
+    },
+  });
+  const url = 'https://example.supabase.co/functions/v1/oracle';
+  const origin = { Origin: 'https://yapox.github.io' };
+  const preflight = await handler(new Request(url, { method: 'OPTIONS', headers: { ...origin, 'Access-Control-Request-Headers': 'authorization,content-type,apikey' } }));
+  assert.equal(preflight.status, 204);
+  assert.equal(await preflight.text(), '');
+  assert.match(preflight.headers.get('access-control-allow-headers'), /apikey/);
+  const response = await handler(new Request(url, { method: 'POST', headers: { ...origin, apikey: 'public-test-key', Authorization: 'Bearer private-session-token' }, body: JSON.stringify({ marketId, message: 'What does YES mean?' }) }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('access-control-allow-origin'), origin.Origin);
+  assert.equal((await response.json()).text, 'YES predicts a FaZe win.');
+  const anonymous = await handler(new Request(url, { method: 'POST', headers: origin, body: JSON.stringify({ marketId }) }));
+  assert.equal(anonymous.status, 401);
+  assert.equal(providerCalls, 1);
+});
+
+test('Edge handler stops oversized streamed bodies in bytes before any database or provider call', async () => {
+  let cancelled = false;
+  const handler = createOracleFetchHandler({ env, database: () => { throw new Error('Must not reach database'); } });
+  const body = new ReadableStream({
+    pull(controller) { controller.enqueue(new Uint8Array(16_384)); },
+    cancel() { cancelled = true; },
+  });
+  const response = await handler(new Request('https://example.supabase.co/functions/v1/oracle', { method: 'POST', headers: { Authorization: 'Bearer test-session' }, body, duplex: 'half' }));
+  assert.equal(response.status, 413);
+  assert.equal(cancelled, true);
 });
