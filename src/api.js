@@ -89,19 +89,21 @@ export function purchaseError(error) {
   return { message: 'The purchase outcome is uncertain. Retry the same request; it will not charge you twice.', definitive: false };
 }
 
-export async function askOracle(marketId) {
+export async function askOracle(marketId, message, history = [], { signal } = {}) {
+  if (!supabase) throw new Error('Account mode is not configured.');
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('Sign in to use The Oracle.');
   const response = await fetch('/api/oracle', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify({ marketId }),
-    signal: AbortSignal.timeout(25_000),
+    body: JSON.stringify({ marketId, message, history }),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(25_000)]) : AbortSignal.timeout(25_000),
   });
   if (!response.headers.get('content-type')?.includes('application/json')) {
     throw new Error('The Oracle endpoint is unavailable. Run the Vercel server or deploy the project with server environment variables.');
   }
   const result = await response.json();
   if (!response.ok) throw new Error(result.error || 'The Oracle could not respond. Please try again.');
+  if (typeof result.text !== 'string' || !result.text.trim()) throw new Error('The Oracle returned an empty reply. Please try again.');
   return result;
 }

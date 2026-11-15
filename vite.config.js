@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { createOracleHandler } from './api/oracle.js';
+import { createOracleHandler, MAX_ORACLE_BODY_BYTES } from './api/oracle.js';
 
 export default defineConfig(({ mode }) => {
   const handler = createOracleHandler({ env: { ...loadEnv(mode, process.cwd(), ''), ...process.env } });
@@ -10,12 +10,20 @@ export default defineConfig(({ mode }) => {
       name: 'oracle-local-api',
       configureServer(server) {
         server.middlewares.use('/api/oracle', async (req, res) => {
-          let body = '';
+          const chunks = [];
+          let bytes = 0;
           for await (const chunk of req) {
-            body += chunk.toString();
-            if (Buffer.byteLength(body) > 8192) { res.statusCode = 413; res.end('Request too large'); return; }
+            bytes += Buffer.byteLength(chunk);
+            if (bytes > MAX_ORACLE_BODY_BYTES) {
+              res.statusCode = 413;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.setHeader('Cache-Control', 'no-store');
+              res.end(JSON.stringify({ error: 'This conversation is too large. Start a new chat.' }));
+              return;
+            }
+            chunks.push(chunk);
           }
-          req.body = body || '{}';
+          req.body = Buffer.concat(chunks).toString('utf8') || '{}';
           await handler(req, res);
         });
       },

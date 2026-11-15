@@ -11,6 +11,7 @@
     "check:flow": "node scripts/check-flow.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "check:account": "node scripts/check-account-flow.mjs",
+    "check:chat": "node scripts/check-oracle-chat.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
