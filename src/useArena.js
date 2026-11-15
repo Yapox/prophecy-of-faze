@@ -17,6 +17,7 @@ export default function useArena() {
   const [mode, setModeState] = useState(initialMode);
   const [practice, setPractice] = useState(() => loadPractice(browserStorage()));
   const [session, setSession] = useState(null);
+  const [recovering, setRecovering] = useState(false);
   const [ready, setReady] = useState(!isConfigured);
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,8 @@ export default function useArena() {
   useEffect(() => {
     if (!supabase) return;
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, next) => {
+      if (event === 'PASSWORD_RECOVERY') { setRecovering(true); setModeState('live'); identity.current.mode = 'live'; }
+      if (event === 'SIGNED_OUT') setRecovering(false);
       const nextId = next?.user.id || null;
       if (identity.current.id !== nextId) {
         identity.current.id = nextId;
@@ -165,7 +168,7 @@ export default function useArena() {
     if (cause) setError('Sign-out failed. Please try again.');
   }
 
-  return { mode, setMode, data, session, ready, loading, updatedAt, error, notice, setNotice, pending, busy,
+  return { mode, setMode, data, session, recovering, finishRecovery: () => setRecovering(false), ready, loading, updatedAt, error, notice, setNotice, pending, busy,
     tradeMessage, setTradeMessage, refresh, purchase, resolvePractice, resetPractice, signOut,
     authenticated: mode === 'live' && Boolean(userId), accountLoaded: mode === 'demo' || Boolean(accountData?.user.id === userId && userId),
     sample: mode === 'demo' };

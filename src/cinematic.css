@@ -155,3 +155,4 @@ th { background: #1c1e1d; }
 @media (prefers-reduced-motion: reduce) {
   .odyssey-art, .odyssey-wave-layer { transform: none !important; opacity: .13 !important; will-change: auto; }
 }
+.auth-recovery-link { display: block; margin-top: 16px; }

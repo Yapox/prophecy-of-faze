@@ -182,6 +182,11 @@ try {
   const signedOutReads = matchReads;
   await act(async () => window.dispatchEvent(new window.Event('focus')));
   assert.equal(matchReads, signedOutReads, 'Sign-out removes the focus refresh listener');
+  // Recovery links must open the password form even for an already-known user.
+  await act(async () => { currentUser = user; authCallback('PASSWORD_RECOVERY', { user }); });
+  assert.match(document.querySelector('dialog').textContent, /Choose a new password/);
+  assert.ok(document.getElementById('confirm-password'));
+  await click(document.querySelector('dialog .icon-button'));
   console.log('PASS: account-mode DOM renders both imported-question fixtures, buys YES and NO, retries a lost response without a duplicate debit, refreshes the wallet/portfolio/leaderboard, and clears private data on logout.');
   console.log('Controlled Supabase responses only. UUIDs/dates are synthetic; no deployed rows were read and no live coins were spent.');
   console.log('PASS: saved practice preference cannot hide account mode; signed-out mode has no sample fallback; focus, visible polling, reconnect, and sign-out cleanup work.');

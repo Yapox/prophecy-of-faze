@@ -10,6 +10,7 @@ import Leaderboard from './pages/Leaderboard.jsx';
 import Oracle from './pages/Oracle.jsx';
 import Legal from './pages/Legal.jsx';
 import CinematicLanding from './pages/CinematicLanding.jsx';
+import { clearRecoveryLocation, recoveryRequested } from './auth.js';
 
 const pageNames = { home: 'Home', markets: 'Markets', portfolio: 'Portfolio', leaderboard: 'Leaderboard', oracle: 'The Oracle', terms: 'Terms of use', privacy: 'Privacy notice' };
 function currentPage() {
@@ -32,7 +33,7 @@ export default function OdysseyApp() {
   const arena = useArena();
   const [page, setPage] = useState(currentPage);
   const [trade, setTrade] = useState(null);
-  const [auth, setAuth] = useState(false);
+  const [auth, setAuth] = useState(recoveryRequested);
   const [oracleMarket, setOracleMarket] = useState('');
   const [game, setGame] = useState('All games');
   const [search, setSearch] = useState('');
@@ -46,6 +47,7 @@ export default function OdysseyApp() {
   }, []);
   useEffect(() => { document.title = `${pageNames[page]} | Prophecy of FaZe`; window.scrollTo({ top: 0, behavior: 'auto' }); }, [page]);
   useEffect(() => { setTrade(null); }, [arena.mode, arena.session?.user.id]);
+  useEffect(() => { if (arena.recovering) { setTrade(null); setAuth(true); } }, [arena.recovering]);
   const matches = new Map(arena.data.matches.map(match => [match.id, match]));
   const markets = arena.data.markets.filter(market => matches.has(market.match_id));
   const loading = arena.mode === 'live' && (!arena.ready || arena.authenticated && !arena.accountLoaded && !arena.error);
@@ -85,6 +87,6 @@ export default function OdysseyApp() {
     </main>
     <footer className="site-footer"><div className="footer-inner"><div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>An unofficial HackUTA 2026 prototype for the FaZe Clan sponsor challenge. No endorsement is implied. All predictions and returns use simulated virtual currency with no cash value.</p></div><nav className="footer-links" aria-label="Legal"><a href="#terms">Terms of use</a><a href="#privacy">Privacy notice</a></nav></div><div className="footer-bottom">NO DEPOSITS. NO WITHDRAWALS. NO CASH REWARDS.</div></footer>
     {trade && selected && arena.accountLoaded && <TradeDialog key={`${arena.mode}:${selected.id}`} market={selected} match={matches.get(selected.match_id)} initialSide={trade.side} initialQuantity={trade.quantity} arena={arena} now={now} onClose={() => setTrade(null)} onPortfolio={() => { setTrade(null); window.location.hash = 'portfolio'; }} />}
-    {auth && <AuthDialog onClose={() => setAuth(false)} onPractice={practice} />}
+    {auth && <AuthDialog key={arena.recovering ? 'recovery' : 'auth'} initialMode={arena.recovering ? 'recovery' : recoveryRequested() ? 'forgot' : 'login'} onClose={() => { setAuth(false); arena.finishRecovery(); clearRecoveryLocation(); }} onPractice={practice} onRecoveryComplete={() => { arena.finishRecovery(); clearRecoveryLocation(); arena.setNotice('Your password has been updated. You are signed in to your account.'); setAuth(false); }} />}
   </>;
 }
