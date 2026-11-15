@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { askOracle } from '../api.js';
+import { askOracle, oracleAvailable } from '../api.js';
 import { formatTime } from '../domain.js';
 import '../oracle.css';
 
@@ -84,7 +84,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
     <section className="oracle-analysis" aria-labelledby="oracle-chat-title">
       <div className="oracle-chat-heading"><div><span className="eyebrow">The Oracle / Gemini</span><h2 id="oracle-chat-title">Ask before you predict.</h2></div>{arena.mode === 'live' && <button className="text-link" onClick={newChat} disabled={!messages.length && !busy && !error}>New chat</button>}</div>
       <p>Ask about this match, follow up on an explanation, or learn how simulated contracts work. Player statistics and recent form are not available in the current match records.</p>
-      {arena.mode === 'demo' ? <div className="notice"><p>This practice brief shows sample records and contract rules. It is not AI-generated. Sign in to chat with Gemini about account matches.</p><button className="button button-secondary button-small" onClick={onAuth}>Use account mode</button></div> : <>
+      {arena.mode === 'demo' ? <div className="notice"><p>This practice brief shows sample records and contract rules. It is not AI-generated. {oracleAvailable ? 'Sign in to chat with Gemini about account matches.' : 'The Oracle chat is not available on this deployment.'}</p><button className="button button-secondary button-small" onClick={onAuth}>Use account mode</button></div> : !oracleAvailable ? <div className="notice"><p>The Oracle chat is not available on this deployment. You can still explore matches and place simulated predictions.</p><a className="text-link" href="#markets">Explore markets</a></div> : <>
         <div className="oracle-conversation" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation with The Oracle">
           {!messages.length && !busy && <div className="oracle-welcome"><span className="eyebrow">A question for your next crossing</span><p>Start with the match question or ask what a YES or NO contract means.</p></div>}
           {messages.map((message, index) => <article className={`oracle-message oracle-message-${message.role}`} key={index}><h3>{message.role === 'user' ? 'You' : 'The Oracle / Gemini'}</h3><p>{message.text}</p></article>)}

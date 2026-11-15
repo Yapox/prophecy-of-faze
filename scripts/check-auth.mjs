@@ -45,7 +45,7 @@ try {
   let signupCount = 0, finishSignup;
   supabase.auth.signUp = async options => {
     signupCount++;
-    assert.equal(options.options.emailRedirectTo, 'http://localhost:5173');
+    assert.equal(options.options.emailRedirectTo, 'http://localhost:5173/');
     return new Promise(resolve => { finishSignup = resolve; });
   };
   closed = false;

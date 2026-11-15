@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 const url = import.meta.env.VITE_SUPABASE_URL;
 const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 export const isConfigured = Boolean(url && key?.startsWith('sb_publishable_'));
+export const oracleAvailable = import.meta.env.VITE_STATIC_HOSTING !== 'true';
 export const supabase = isConfigured
   ? createClient(url, key, {
       auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
@@ -90,6 +91,7 @@ export function purchaseError(error) {
 }
 
 export async function askOracle(marketId, message, history = [], { signal } = {}) {
+  if (!oracleAvailable) throw new Error('The Oracle chat is not available on this deployment. You can still explore matches and place simulated predictions.');
   if (!supabase) throw new Error('Account mode is not configured.');
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('Sign in to use The Oracle.');

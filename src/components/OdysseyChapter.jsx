@@ -3,9 +3,10 @@ import { m, useReducedMotion, useScroll, useTransform } from 'motion/react';
 
 function Artwork({ figure, eager = false }) {
   const landscape = figure === 'ithaca';
+  const base = import.meta.env.BASE_URL || '/';
   return <picture>
-    <source media="(max-width: 640px)" srcSet={`/odyssey/${figure}-mobile.webp`} />
-    <img src={`/odyssey/${figure}-desktop.webp`} alt="" width={landscape ? 1440 : 960} height={landscape ? 720 : 1440} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'low'} decoding="async" draggable="false" />
+    <source media="(max-width: 640px)" srcSet={`${base}odyssey/${figure}-mobile.webp`} />
+    <img src={`${base}odyssey/${figure}-desktop.webp`} alt="" width={landscape ? 1440 : 960} height={landscape ? 720 : 1440} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : 'low'} decoding="async" draggable="false" />
   </picture>;
 }
 

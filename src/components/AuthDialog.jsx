@@ -17,7 +17,7 @@ export default function AuthDialog({ onClose, onPractice }) {
     try {
       const { data, error } = mode === 'login'
         ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: new URL(import.meta.env.BASE_URL || '/', window.location.origin).href } });
       if (error) {
         const messages = { invalid_credentials: 'Check your email and password.', email_not_confirmed: 'Confirm your email before signing in.', weak_password: 'Choose a stronger password.', over_email_send_rate_limit: 'Please wait before requesting another email.' };
         throw new Error(messages[error.code] || 'We could not complete sign-in. Please try again.');
