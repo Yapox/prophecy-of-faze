@@ -43,6 +43,10 @@ try {
     const match = matches.find(row => row.external_reference === reference);
     return { reference, found: Boolean(match), linkedQuestions: match ? markets.filter(market => market.match_id === match.id).map(market => market.question) : [] };
   });
+  for (const match of report.requestedMatches) {
+    assert.ok(match.found, 'A requested imported match is missing');
+    assert.ok(match.linkedQuestions.length, 'An imported match has no prediction question');
+  }
   const imported = matches.find(match => match.game === 'CS2' && match.external_reference?.startsWith('pandascore:match:'));
   if (imported) {
     const sample = await createRecentResultsReader()(imported, process.env.PANDASCORE_API_TOKEN);

@@ -1,6 +1,11 @@
 name: Test Deployed Account Integration
 on:
   workflow_dispatch:
+    inputs:
+      readiness_only:
+        description: Check database migration availability without creating a test account
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -16,9 +21,17 @@ jobs:
         with:
           node-version: '22'
           cache: npm
+      - name: Inspect deployed automation schema without database writes
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: node scripts/check-deployment-readiness.mjs
       - run: npm ci
+        if: ${{ !inputs.readiness_only }}
       - run: npx playwright install --with-deps chromium --only-shell
+        if: ${{ !inputs.readiness_only }}
       - name: Test public website with a temporary confirmed QA account
+        if: ${{ !inputs.readiness_only }}
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
@@ -27,7 +40,7 @@ jobs:
           PUBLIC_SITE_URL: https://yapox.github.io/prophecy-of-faze/
         run: node scripts/check-live-integration.mjs
       - name: Upload non-secret verification report
-        if: always()
+        if: ${{ always() && !inputs.readiness_only }}
         uses: actions/upload-artifact@v4
         with:
           name: live-integration-report
