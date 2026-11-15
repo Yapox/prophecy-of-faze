@@ -10,6 +10,7 @@
     "test": "node --test scripts/domain.test.mjs scripts/oracle.test.mjs",
     "check:flow": "node scripts/check-flow.mjs",
     "check:auth": "node scripts/check-auth.mjs",
+    "check:account": "node scripts/check-account-flow.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

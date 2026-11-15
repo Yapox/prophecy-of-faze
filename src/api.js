@@ -35,7 +35,7 @@ export async function requireUser() {
 export async function loadDashboard() {
   const user = await requireUser();
   const [matches, markets, wallet, positions, history, leaderboard] = await Promise.all([
-    allRows('matches', 'id,game,event_name,faze_team,opponent,starts_at,created_at'),
+    allRows('matches', 'id,game,event_name,faze_team,opponent,starts_at,external_reference,created_at'),
     allRows('prediction_markets', 'id,match_id,question,closes_at,status,winning_side,settled_at,created_at'),
     supabase.from('wallets').select('user_id,balance,updated_at').eq('user_id', user.id).single().then(unwrap),
     allRows('prediction_positions', 'id,user_id,market_id,side,stake,request_id,created_at', user.id),
