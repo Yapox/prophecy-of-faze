@@ -5,6 +5,7 @@ import useArena from './useArena.js';
 import MarketCard from './components/MarketCard.jsx';
 import TradeDialog from './components/TradeDialog.jsx';
 import AuthDialog from './components/AuthDialog.jsx';
+import GitHubProfile from './components/GitHubProfile.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Oracle from './pages/Oracle.jsx';
@@ -84,8 +85,8 @@ export default function OdysseyApp() {
     </main>
     <footer className="site-footer">
       <div className="footer-inner">
-        <div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Built for HackUTA 2026. Unofficial and not endorsed by FaZe Clan.</p></div>
-        <div className="footer-credit"><p>© 2026 Aashaswa Khakurel &amp; Subigya Poudel.</p><p>All rights reserved.</p></div>
+        <div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Built for HackUTA 2026.</p></div>
+        <div className="footer-credit"><p>© 2026 <GitHubProfile name="Aashaswa Khakurel" username="Yapox" /> <span className="footer-creator-pair">&amp; Subigya Poudel.</span></p><p>All rights reserved.</p></div>
       </div>
       <div className="footer-bottom">SIMULATED COINS ONLY · NO CASH VALUE</div>
     </footer>

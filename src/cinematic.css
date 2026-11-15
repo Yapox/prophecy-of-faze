@@ -184,6 +184,30 @@ th { background: #1c1e1d; }
 .auth-submit { margin-top: 20px; }
 .footer-credit { align-self: center; text-align: right; }
 .footer-credit p:first-child { color: var(--color-ink); font-size: .75rem; }
+.footer-creator-pair { display: inline-block; white-space: nowrap; }
+.footer-profile { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; vertical-align: middle; color: var(--color-ink); }
+.footer-profile-name { text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 4px; }
+.footer-github-icon { display: inline-grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 50%; background: var(--paper); color: #fff; transition: background-color .18s ease, border-color .18s ease, transform .18s ease; }
+.footer-github-mark { display: block; transform-origin: 50% 65%; }
+.footer-profile.is-visible .footer-github-mark { animation: github-wiggle 1.15s ease-in-out .15s 2; }
+.footer-profile:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.footer-profile:focus-visible .footer-profile-name { text-decoration-color: var(--accent); }
+.footer-profile:focus-visible .footer-github-icon { background: var(--faze-red); border-color: var(--crimson); animation: github-wiggle .65s ease-in-out 2; }
+.footer-profile:active .footer-github-icon { transform: scale(.92); }
+@media (hover: hover) and (pointer: fine) {
+  .footer-profile:hover .footer-profile-name { text-decoration-color: var(--accent); }
+  .footer-profile:hover .footer-github-icon { background: var(--faze-red); border-color: var(--crimson); animation: github-wiggle .65s ease-in-out 2; }
+}
+@keyframes github-wiggle {
+  0%, 55%, 100% { transform: rotate(0); }
+  12% { transform: rotate(-10deg); }
+  25% { transform: rotate(8deg); }
+  38% { transform: rotate(-5deg); }
+  48% { transform: rotate(3deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer-github-icon, .footer-github-mark { animation: none !important; transition: none; transform: none !important; }
+}
 @media (max-width: 780px) {
   .footer-credit { text-align: left; }
 }
