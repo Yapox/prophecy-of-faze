@@ -101,7 +101,7 @@ export async function askOracle(marketId, message, history = [], { signal } = {}
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
     body: JSON.stringify({ marketId, message, history }),
-    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(25_000)]) : AbortSignal.timeout(25_000),
+    signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(40_000)]) : AbortSignal.timeout(40_000),
   });
   if (!response.headers.get('content-type')?.includes('application/json')) {
     throw new Error('The Oracle endpoint is unavailable. Run the Vercel server or deploy the project with server environment variables.');

@@ -27,3 +27,9 @@
   .oracle-suggestions { align-items: stretch; flex-direction: column; }
   .oracle-suggestions .button { justify-content: start; }
 }
+.oracle-result-sample { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 24px; }
+.oracle-result-sample > div { padding: 14px 0; }
+.oracle-result-sample p { font-size: .78rem; margin-top: 8px; }
+.oracle-result-sample ul { list-style: none; padding: 0; margin: 12px 0; }
+.oracle-result-sample li { font-size: .75rem; padding: 10px 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.oracle-result-sample time { display: block; margin-top: 6px; color: var(--muted); font-size: .65rem; }

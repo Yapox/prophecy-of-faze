@@ -8,7 +8,7 @@
     "build": "vite build",
     "build:pages": "vite build --mode github-pages --base=/prophecy-of-faze/",
     "check:render": "node scripts/check-render.mjs",
-    "test": "node --test scripts/domain.test.mjs scripts/activity.test.mjs scripts/oracle.test.mjs",
+    "test": "node --test scripts/domain.test.mjs scripts/activity.test.mjs scripts/oracle.test.mjs scripts/recent-results.test.mjs",
     "check:flow": "node scripts/check-flow.mjs",
     "check:auth": "node scripts/check-auth.mjs",
     "check:account": "node scripts/check-account-flow.mjs",

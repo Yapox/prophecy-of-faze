@@ -10,6 +10,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
   const [draft, setDraft] = useState('');
   const [error, setError] = useState('');
   const [pendingQuestion, setPendingQuestion] = useState('');
+  const [stats, setStats] = useState(null);
   const generation = useRef(0);
   const inFlight = useRef(null);
   const input = useRef(null);
@@ -21,7 +22,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
     generation.current++;
     inFlight.current?.abort();
     inFlight.current = null;
-    setMessages([]); setDraft(''); setError(''); setPendingQuestion('');
+    setMessages([]); setDraft(''); setError(''); setPendingQuestion(''); setStats(null);
     return () => { generation.current++; inFlight.current?.abort(); inFlight.current = null; };
   }, [market?.id, arena.mode, arena.session?.user.id]);
 
@@ -29,7 +30,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
     generation.current++;
     inFlight.current?.abort();
     inFlight.current = null;
-    setMessages([]); setDraft(''); setError(''); setPendingQuestion('');
+    setMessages([]); setDraft(''); setError(''); setPendingQuestion(''); setStats(null);
     input.current?.focus();
   }
 
@@ -44,7 +45,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
     setPendingQuestion(text); setDraft(''); setError('');
     try {
       const response = await askOracle(market.id, text, messages.slice(-6), { signal: controller.signal });
-      if (current === generation.current) setMessages(previous => [...previous, { role: 'user', text }, { role: 'model', text: response.text }]);
+      if (current === generation.current) { setMessages(previous => [...previous, { role: 'user', text }, { role: 'model', text: response.text }]); setStats(response.stats || null); }
     } catch (cause) {
       if (current === generation.current) {
         setDraft(text);
@@ -75,6 +76,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
         <div><dt>Prediction closes</dt><dd>{formatTime(market.closes_at)}</dd></div>
         <div><dt>Source</dt><dd>{arena.sample ? 'Seeded sample fixture. Not an actual schedule.' : 'Supabase match record'}</dd></div>
       </dl>
+      {stats && <section className="oracle-result-sample" aria-label="Provider result sample"><h3>Recent result sample</h3>{stats.available ? <><p className="source-note">PandaScore · fetched {formatTime(stats.checkedAt)} · {stats.scannedMatches} CS2 fixtures inspected. Up to five validated results per team.</p>{stats.teams.map(team => <div key={team.name}><strong>{team.name}</strong><p>{team.played ? `${team.wins} wins in ${team.played} sampled results` : 'No unambiguous results found in this sample.'}</p>{team.results.length > 0 && <ul>{team.results.map(result => <li key={result.providerMatchId}><span>{result.won ? 'Won' : 'Lost'} {result.scoreFor}:{result.scoreAgainst} vs {result.opponent}</span><time dateTime={result.endedAt}>{formatTime(result.endedAt)}</time></li>)}</ul>}</div>)}<p className="source-note">This bounded sample can omit matches. It is not a win probability. Player statistics are unavailable.</p></> : <p className="source-note">{stats.reason}</p>}</section>}
       <dl className="trade-summary">
         <div><dt>Cost of 100 contracts</dt><dd>100 virtual coins</dd></div>
         <div><dt>Return if correct</dt><dd>200 virtual coins</dd></div>
@@ -83,7 +85,7 @@ export default function Oracle({ arena, selectedMarket, onSelect, onAuth }) {
     </aside>
     <section className="oracle-analysis" aria-labelledby="oracle-chat-title">
       <div className="oracle-chat-heading"><div><span className="eyebrow">The Oracle / Gemini</span><h2 id="oracle-chat-title">Ask before you predict.</h2></div>{arena.mode === 'live' && <button className="text-link" onClick={newChat} disabled={!messages.length && !busy && !error}>New chat</button>}</div>
-      <p>Ask about this match, follow up on an explanation, or learn how simulated contracts work. Player statistics and recent form are not available in the current match records.</p>
+      <p>Ask about this match, follow up on an explanation, or learn how simulated contracts work. When configured, the server adds a sourced sample of recent CS2 results. Player statistics are not supplied.</p>
       {arena.mode === 'demo' ? <div className="notice"><p>This practice brief shows sample records and contract rules. It is not AI-generated. {oracleAvailable ? 'Sign in to chat with Gemini about account matches.' : 'The Oracle chat is not available on this deployment.'}</p><button className="button button-secondary button-small" onClick={onAuth}>Use account mode</button></div> : !oracleAvailable ? <div className="notice"><p>The Oracle chat is not available on this deployment. You can still explore matches and place simulated predictions.</p><a className="text-link" href="#markets">Explore markets</a></div> : <>
         <div className="oracle-conversation" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Conversation with The Oracle">
           {!messages.length && !busy && <div className="oracle-welcome"><span className="eyebrow">A question for your next crossing</span><p>Start with the match question or ask what a YES or NO contract means.</p></div>}
