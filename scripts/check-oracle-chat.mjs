@@ -64,7 +64,7 @@ async function click(element) {
   await act(async () => element.dispatchEvent(new window.MouseEvent('click', { bubbles: true })));
 }
 async function type(text) {
-  const field = document.getElementById('oracle-question');
+  const field = document.querySelector('.oracle-composer textarea');
   await act(async () => {
     Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set.call(field, text);
     field.dispatchEvent(new window.Event('input', { bubbles: true }));
@@ -138,7 +138,45 @@ try {
   assert.equal(document.querySelector('textarea'), null);
   assert.match(document.body.textContent, /not AI-generated/);
   assert.equal(window.localStorage.length, 0, 'Chat is not persisted to local storage');
+
+  const { default: OracleWidget } = await server.ssrLoadModule('/src/components/OracleWidget.jsx');
+  const renderWidget = props => act(async () => root.render(createElement(Harness, { Oracle: OracleWidget, ...props })));
+  await renderWidget({ authenticated: false });
+  const launcher = () => document.querySelector('[aria-controls="oracle-home-chat"]');
+  assert.equal(launcher().getAttribute('aria-expanded'), 'false');
+  await click(launcher());
+  assert.equal(document.getElementById('oracle-home-chat').hidden, false);
+  await click(document.querySelector('.oracle-widget-empty button'));
+  assert.equal(authClicks, 2);
+  await renderWidget({});
+  await click(document.querySelector('.oracle-suggestions button'));
+  assert.equal(requests.at(-1).marketId, null, 'Home chat supports app questions without choosing a match');
+  assert.match(providerPayloads.at(-1).systemInstruction.parts[0].text, /app_guide/);
+  assert.match(document.querySelector('[role="log"]').textContent, /2 virtual coins/);
+  const selector = document.getElementById('oracle-widget-market');
+  await act(async () => { selector.value = markets[1].id; selector.dispatchEvent(new window.Event('change', { bubbles: true })); });
+  assert.equal(document.querySelectorAll('.oracle-message').length, 0, 'Changing context clears the prior general conversation');
+  await type('Explain this prediction.');
+  await submitTwice();
+  assert.equal(requests.at(-1).marketId, markets[1].id);
+  deferred = {};
+  await type('Please explain the payout.');
+  await submitTwice();
+  const minimizedReply = deferred;
+  await click(launcher());
+  assert.equal(document.getElementById('oracle-home-chat').hidden, true);
+  assert.equal(document.querySelector('textarea').value, 'Please explain the payout.', 'Closing restores an unfinished question');
+  await act(async () => minimizedReply.resolve(reply('Discard this reply from the closed panel.')));
+  assert.doesNotMatch(document.querySelector('[role="log"]').textContent, /Discard this reply/);
+  deferred = null;
+  await click(launcher());
+  await act(async () => document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+  assert.equal(launcher().getAttribute('aria-expanded'), 'false');
+  assert.equal(document.activeElement, launcher(), 'Escape returns keyboard focus to the toggle');
+  await renderWidget({ authenticated: false });
+  assert.equal(document.querySelector('[role="log"]'), null, 'Logging out clears widget conversation');
   console.log('PASS: Oracle chat uses the API helper and server handler with controlled Gemini responses; sign-in gating, suggestions, follow-ups, duplicate protection, quota retry, new chat, match-change cancellation, stale replies, and logout/practice behavior work.');
+  console.log('PASS: home chat toggle, sign-in, general app help, match selection, minimized-request cancellation, Escape and focus restoration.');
   console.log('No live Gemini, Supabase, or browser visual inspection was performed.');
 } finally {
   await act(async () => root.unmount());

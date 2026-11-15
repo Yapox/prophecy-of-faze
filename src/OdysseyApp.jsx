@@ -6,6 +6,7 @@ import MarketCard from './components/MarketCard.jsx';
 import TradeDialog from './components/TradeDialog.jsx';
 import AuthDialog from './components/AuthDialog.jsx';
 import GitHubProfile from './components/GitHubProfile.jsx';
+import OracleWidget from './components/OracleWidget.jsx';
 import Portfolio from './pages/Portfolio.jsx';
 import Leaderboard from './pages/Leaderboard.jsx';
 import Oracle from './pages/Oracle.jsx';
@@ -83,13 +84,14 @@ export default function OdysseyApp() {
         {['portfolio', 'leaderboard'].includes(page) && arena.authenticated && <div className="status-row"><button className="button button-secondary button-small" onClick={arena.refresh} disabled={arena.loading}>{arena.loading ? 'Refreshing…' : 'Refresh'}</button></div>}
         {loading && ['portfolio', 'leaderboard', 'oracle'].includes(page) ? <Loading /> : <>{page === 'portfolio' && <Portfolio arena={arena} onAuth={() => setAuth(true)} />}{page === 'leaderboard' && <Leaderboard arena={arena} now={now} onAuth={() => setAuth(true)} />}{page === 'oracle' && <Oracle arena={arena} selectedMarket={oracleMarket} onSelect={setOracleMarket} onAuth={account} />}</>}
     </main>
-    <footer className="site-footer">
+    <footer className={`site-footer${page === 'home' ? ' footer-with-oracle' : ''}`}>
       <div className="footer-inner">
         <div><a className="footer-brand" href="#home">Prophecy of FaZe</a><p>Built for HackUTA 2026.</p></div>
         <div className="footer-credit"><p>© 2026 <GitHubProfile name="Aashaswa Khakurel" username="Yapox" /> <span className="footer-creator-pair">&amp; <GitHubProfile name="Subigya Poudel" username="Yapox" />.</span></p><p>All rights reserved.</p></div>
       </div>
       <div className="footer-bottom">SIMULATED COINS ONLY · NO CASH VALUE</div>
     </footer>
+    {page === 'home' && <OracleWidget arena={arena} onAuth={account} obscured={Boolean(auth || trade)} />}
     {trade && selected && arena.accountLoaded && <TradeDialog key={`${arena.mode}:${selected.id}`} market={selected} match={matches.get(selected.match_id)} initialSide={trade.side} initialQuantity={trade.quantity} arena={arena} now={now} onClose={() => setTrade(null)} onPortfolio={() => { setTrade(null); window.location.hash = 'portfolio'; }} />}
     {auth && <AuthDialog key={arena.recovering ? 'recovery' : 'auth'} initialMode={arena.recovering ? 'recovery' : recoveryRequested() ? 'forgot' : 'login'} onClose={() => { setAuth(false); arena.finishRecovery(); clearRecoveryLocation(); }} onPractice={practice} onRecoveryComplete={() => { arena.finishRecovery(); clearRecoveryLocation(); arena.setNotice('Your password has been updated. You are signed in to your account.'); setAuth(false); }} />}
   </>;

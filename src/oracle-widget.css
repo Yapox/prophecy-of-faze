@@ -1,0 +1,83 @@
+.oracle-widget { --oracle-red: #b52636; --oracle-red-hover: #cc3443; --oracle-border: #6d343b; position: fixed; right: 28px; bottom: max(22px, env(safe-area-inset-bottom)); z-index: 20; }
+.oracle-widget[hidden], .oracle-widget-panel[hidden] { display: none; }
+.footer-with-oracle { padding-bottom: 78px; }
+.oracle-widget-launcher { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 8px 20px 8px 13px; border: 1px solid #ee6a5a; border-radius: 6px; color: #fff3e5; background: var(--oracle-red); box-shadow: 0 5px 22px #a4292c44; text-align: left; transition: background-color .18s ease, transform .18s ease; }
+.oracle-widget-fire { display: grid; place-items: center; width: 35px; height: 44px; }
+.oracle-flame { display: block; transform-origin: 50% 100%; }
+.oracle-widget-launcher .oracle-flame { animation: oracle-fire-flicker 2.6s ease-in-out infinite; }
+.oracle-widget-label { font-size: .8rem; font-weight: 700; line-height: 1.4; }
+.oracle-widget-label small { display: block; font-size: .6rem; font-weight: 400; opacity: .9; margin-top: 3px; }
+.oracle-widget-launcher:active { transform: translateY(1px); }
+.oracle-widget-panel { position: absolute; right: 0; bottom: calc(100% + 14px); width: 390px; max-width: calc(100vw - 32px); max-height: min(660px, calc(100dvh - 116px)); display: flex; flex-direction: column; background: #1b1d20; color: #f0ebdf; border: 1px solid var(--oracle-border); border-radius: 6px; box-shadow: 0 12px 40px #0006; overflow: hidden; }
+.oracle-widget-panel.has-conversation { height: min(660px, calc(100dvh - 116px)); }
+.oracle-widget-header { display: flex; align-items: center; gap: 12px; padding: 17px 15px 17px 20px; border-bottom: 1px solid var(--oracle-border); background: #2b1d22; flex-shrink: 0; }
+.oracle-widget-seal { width: 35px; flex-shrink: 0; }
+.oracle-widget-header h2 { font-size: 1.9rem; letter-spacing: -.025em; }
+.oracle-widget-header p { font-size: .64rem; margin: 5px 0 0; color: #c5b9b2; }
+.oracle-widget-close { margin-left: auto; width: 44px; height: 44px; display: grid; place-items: center; flex-shrink: 0; background: transparent; color: #f0ebdf; border: 1px solid #65434a; border-radius: 4px; }
+.oracle-widget-body { overflow: auto; overscroll-behavior: contain; min-height: 0; }
+.has-conversation .oracle-widget-body { flex: 1; display: flex; overflow: hidden; }
+.oracle-widget-empty { padding: 28px 25px; }
+.oracle-widget-empty h3, .oracle-compact .oracle-welcome h3 { font-family: var(--display); font-size: 2rem; letter-spacing: -.025em; font-weight: 500; }
+.oracle-widget-empty > p { color: var(--muted); font-size: .8rem; margin: 13px 0 22px; }
+.oracle-widget-empty > .button { width: 100%; }
+.oracle-widget-empty > .text-link { display: flex; align-items: center; width: fit-content; margin: 10px auto 0; min-height: 44px; }
+.oracle-widget-topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 28px; }
+.oracle-widget-topics span { font-size: .66rem; border: 1px solid #514348; padding: 7px 9px; color: #d7c6bd; }
+.oracle-widget-empty .oracle-widget-disclaimer { margin: 15px 0 0; font-size: .63rem; text-align: center; }
+.oracle-fire-action { background: var(--oracle-red); color: #fff3e5; border-color: #e35c59; }
+.oracle-compact { padding: 0 20px 18px; width: 100%; display: flex; flex-direction: column; min-height: 0; }
+.oracle-compact .oracle-analysis { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.oracle-widget-context { display: grid; gap: 7px; margin-top: 17px; flex-shrink: 0; }
+.oracle-widget-context label { font-size: .65rem; color: var(--muted); }
+.oracle-widget-context select { width: 100%; min-width: 0; min-height: 44px; font-size: .74rem; border-color: #51484b; background: #252329; }
+.oracle-compact .oracle-chat-heading { justify-content: end; min-height: 30px; }
+.oracle-compact .oracle-chat-heading:empty { display: none; }
+.oracle-compact .oracle-chat-heading > button { margin-top: 6px; font-size: .65rem; }
+.oracle-compact .oracle-conversation { flex: 1; min-height: 70px; max-height: none; overflow-y: auto; overscroll-behavior: contain; border: 0; margin-top: 0; background: transparent; }
+.oracle-compact .oracle-conversation:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.oracle-compact .oracle-chat-heading, .oracle-compact .oracle-chat-status, .oracle-compact .oracle-suggestions, .oracle-compact .oracle-composer, .oracle-compact .source-note { flex-shrink: 0; }
+.oracle-compact .oracle-welcome { padding: 18px 0 12px; }
+.oracle-compact .oracle-welcome h3 { font-size: 1.85rem; }
+.oracle-compact .oracle-welcome p { font-size: .78rem; color: var(--muted); margin-top: 10px; }
+.oracle-compact .oracle-message { padding: 14px; font-size: .79rem; }
+.oracle-compact .oracle-message-user { background: #39262c; }
+.oracle-compact .oracle-message h3 { font-size: .63rem; color: #f09c88; margin-bottom: 7px; }
+.oracle-compact .oracle-message p { line-height: 1.65; }
+.oracle-compact .oracle-chat-status { font-size: .67rem; min-height: 23px; }
+.oracle-compact .oracle-suggestions { flex-direction: row; flex-wrap: wrap; gap: 7px; margin-bottom: 15px; }
+.oracle-compact .oracle-suggestions .button { justify-content: start; padding: 10px 12px; min-height: 44px; font-size: .72rem; border-color: #554248; }
+.oracle-compact .oracle-composer { margin-top: 0; padding-top: 0; }
+.oracle-compact .oracle-composer .field-label { margin-top: 13px; font-size: .7rem; }
+.oracle-compact .oracle-composer textarea { min-height: 72px; max-height: 145px; resize: vertical; padding: 10px 12px; font-size: .8rem; border-color: #72636b; }
+.oracle-compact .oracle-composer-actions { flex-direction: row; justify-content: space-between; align-items: center; margin-top: 8px; gap: 10px; }
+.oracle-compact .oracle-composer-actions .button { min-width: 78px; min-height: 44px; }
+.oracle-compact .source-note { font-size: .6rem; line-height: 1.6; margin: 12px 0 0; color: var(--muted); }
+.oracle-widget-launcher:focus-visible, .oracle-widget-close:focus-visible, .oracle-fire-action:focus-visible { outline: 2px solid #ffd69e; outline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) {
+  .oracle-widget-launcher:hover, .oracle-fire-action:hover:not(:disabled) { background: var(--oracle-red-hover); }
+  .oracle-widget-launcher:hover { transform: translateY(-2px); }
+  .oracle-widget-close:hover { background: #48262f; }
+}
+@keyframes oracle-fire-flicker { 0%, 100% { transform: rotate(-3deg) scaleY(.96); } 45% { transform: rotate(3deg) scaleY(1.05); } 70% { transform: rotate(-1deg) scaleY(1); } }
+@media (max-width: 520px) {
+  .oracle-widget { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); }
+  .oracle-widget-launcher { min-height: 56px; gap: 9px; padding: 6px 15px 6px 10px; }
+  .oracle-widget-label { font-size: .75rem; }
+  .oracle-widget-label small { display: none; }
+  .oracle-widget-panel { width: calc(100vw - 32px); max-height: calc(100dvh - 102px); bottom: calc(100% + 12px); }
+  .oracle-widget-panel.has-conversation { height: min(700px, calc(100dvh - 102px)); }
+  .oracle-widget-header { padding: 13px 12px 13px 17px; gap: 10px; }
+  .oracle-widget-empty { padding: 24px 20px; }
+  .oracle-compact { padding: 0 16px 16px; }
+}
+@media (max-height: 680px) {
+  .has-conversation .oracle-widget-body { overflow-y: auto; }
+  .oracle-compact { min-height: min-content; }
+  .oracle-compact .oracle-conversation { flex: none; min-height: 90px; max-height: 150px; }
+  .oracle-compact .oracle-suggestions .button:nth-child(n+2) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oracle-widget-launcher .oracle-flame { animation: none; }
+  .oracle-widget-launcher, .oracle-fire-action { transition: none; transform: none !important; }
+}

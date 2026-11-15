@@ -10,7 +10,7 @@ const APP_GUIDE = {
   accounts: 'Create an account, confirm email if requested, then sign in. New accounts receive 1,000 free virtual coins. Never share a password or API key in chat.',
   predictions: 'Open Markets, choose a published question, select YES or NO, enter a whole number of contracts, review the cost and potential return, then confirm. Each contract costs 1 virtual coin and returns 2 total if correct, 0 if incorrect. Cancelled markets refund the stake. These are fixed contract rules, not variable prices or win probabilities.',
   portfolio: 'Portfolio shows the virtual balance, positions, transaction history and simulated profit/loss. After a purchase, the wallet and account records refresh. If confirmation is uncertain, retry the original pending request; do not make a new purchase just to retry it.',
-  leaderboard: 'Leaderboard shows simulated trading performance. Prediction streaks and daily goals appear in Portfolio; they do not award extra coins.',
+  leaderboard: 'Leaderboard shows simulated trading performance, prediction streaks and daily goals. These goals do not award extra coins.',
   practice: 'Try practice mode uses sample fixtures and a separate wallet saved on this device. Use account mode loads published Supabase records after sign-in. Practice data is not live match data.',
   navigation: 'Home: #home. Markets: #markets. Portfolio and history: #portfolio. Leaderboard: #leaderboard. Full match analysis: #oracle.',
   assistance: 'Explain app features, simulated prediction mechanics, wallet rules and navigation. You cannot see personal balances or positions, reset passwords, make purchases, settle markets, or change account data. Do not claim a trade was executed or suggest a stake size.',

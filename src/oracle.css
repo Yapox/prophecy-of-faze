@@ -7,7 +7,7 @@
 .oracle-welcome p { margin: 12px 0 0; }
 .oracle-message { padding: 22px 25px; overflow-wrap: anywhere; }
 .oracle-message + .oracle-message { border-top: 1px solid var(--border); }
-.oracle-message-user { background: #eae6da; }
+.oracle-message-user { background: #39262c; }
 .oracle-message h3 { color: var(--accent); font-size: .7rem; margin: 0 0 10px; }
 .oracle-message p { white-space: pre-wrap; color: var(--color-ink); margin: 0; line-height: 1.75; }
 .oracle-chat-status { min-height: 28px; padding-top: 6px; font-size: .75rem; color: var(--muted); }
