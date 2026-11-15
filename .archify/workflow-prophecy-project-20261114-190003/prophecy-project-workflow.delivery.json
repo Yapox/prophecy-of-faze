@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "784c6fb3-4019-4a53-848c-54aa1f3e758e",
+  "status": "current",
+  "command": "deliver",
+  "type": "workflow",
+  "input": "C:\\Users\\asus\\OneDrive\\Desktop\\prophecy-of-faze-main\\.archify\\workflow-prophecy-project-20261114-190003\\candidate.json",
+  "output": "C:\\Users\\asus\\OneDrive\\Desktop\\prophecy-of-faze-main\\.archify\\workflow-prophecy-project-20261114-190003\\prophecy-project-workflow.html",
+  "specification": {
+    "sha256": "45101c10e5cfb33765e4226536e88c699c90a43a15d899951fcd54f573d72bbf",
+    "bytes": 12577
+  },
+  "artifact": {
+    "sha256": "a1d7f6f195c09e2e013847d8a3b365386728ab230a9c8aef9ad847f9a4d7fd12",
+    "bytes": 779457
+  }
+}

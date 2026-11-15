@@ -1,0 +1,545 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Prophecy of FaZe: Project Workflow So Far",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/Yapox/prophecy-of-faze.git",
+      "revision": "a4283616e19f249dce2a096ae383a08bb7be8673",
+      "link_mode": "local-only"
+    },
+    "output": ".archify/workflow-prophecy-project-20261114-190003/prophecy-project-workflow.html"
+  },
+  "lanes": [
+    {
+      "id": "discovery",
+      "label": "Start / select mode"
+    },
+    {
+      "id": "practice",
+      "label": "Practice / browser only"
+    },
+    {
+      "id": "account",
+      "label": "Account / deployed Supabase"
+    },
+    {
+      "id": "settlement",
+      "label": "Trusted result / no browser access"
+    },
+    {
+      "id": "oracle",
+      "label": "Optional Oracle / server configuration required"
+    }
+  ],
+  "mainPath": [
+    "explore",
+    "mode",
+    "auth",
+    "review",
+    "purchase",
+    "db",
+    "accountportfolio"
+  ],
+  "nodes": [
+    {
+      "id": "explore",
+      "lane": "discovery",
+      "col": 0,
+      "type": "frontend",
+      "label": "Open the arena",
+      "sublabel": "Odyssey React interface",
+      "sources": [
+        {
+          "path": "src/OdysseyApp.jsx",
+          "line": 25,
+          "end_line": 46
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "mode",
+      "lane": "discovery",
+      "col": 1,
+      "type": "frontend",
+      "label": "Choose a mode",
+      "sublabel": "Practice or account",
+      "sources": [
+        {
+          "path": "src/useArena.js",
+          "line": 68,
+          "end_line": 72
+        },
+        {
+          "path": "src/OdysseyApp.jsx",
+          "line": 47,
+          "end_line": 54
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "sample",
+      "lane": "practice",
+      "col": 2,
+      "type": "frontend",
+      "label": "Sample prediction",
+      "sublabel": "YES / NO + cost preview",
+      "tag": "1,000 starting coins",
+      "sources": [
+        {
+          "path": "src/domain.js",
+          "line": 1,
+          "end_line": 26
+        },
+        {
+          "path": "src/components/TradeDialog.jsx",
+          "line": 35,
+          "end_line": 49
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "localtrade",
+      "lane": "practice",
+      "col": 3,
+      "type": "backend",
+      "label": "Practice purchase",
+      "sublabel": "Validate + debit once",
+      "sources": [
+        {
+          "path": "src/domain.js",
+          "line": 43,
+          "end_line": 64
+        },
+        {
+          "path": "src/useArena.js",
+          "line": 91,
+          "end_line": 95
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "browserstore",
+      "lane": "practice",
+      "col": 4,
+      "type": "database",
+      "label": "Browser wallet",
+      "sublabel": "Positions + transaction log",
+      "tag": "local storage",
+      "sources": [
+        {
+          "path": "src/useArena.js",
+          "line": 75,
+          "end_line": 81
+        },
+        {
+          "path": "src/domain.js",
+          "line": 58,
+          "end_line": 64
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "practiceportfolio",
+      "lane": "practice",
+      "col": 5,
+      "type": "frontend",
+      "label": "Practice portfolio",
+      "sublabel": "Results + personal rank",
+      "tag": "DOM flow tested",
+      "sources": [
+        {
+          "path": "src/pages/Portfolio.jsx",
+          "line": 5,
+          "end_line": 29
+        },
+        {
+          "path": "src/pages/Leaderboard.jsx",
+          "line": 4,
+          "end_line": 16
+        },
+        {
+          "path": "scripts/check-flow.mjs",
+          "line": 34,
+          "end_line": 56
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "auth",
+      "lane": "account",
+      "col": 1,
+      "type": "security",
+      "label": "Sign up / sign in",
+      "sublabel": "Confirm email for access",
+      "tag": "Persistent session",
+      "sources": [
+        {
+          "path": "src/components/AuthDialog.jsx",
+          "line": 11,
+          "end_line": 25
+        },
+        {
+          "path": "src/api.js",
+          "line": 3,
+          "end_line": 9
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "review",
+      "lane": "account",
+      "col": 2,
+      "type": "frontend",
+      "label": "Account prediction",
+      "sublabel": "YES / NO + whole coins",
+      "tag": "Signed-in user only",
+      "sources": [
+        {
+          "path": "src/OdysseyApp.jsx",
+          "line": 49,
+          "end_line": 54
+        },
+        {
+          "path": "src/components/TradeDialog.jsx",
+          "line": 16,
+          "end_line": 27
+        },
+        {
+          "path": "src/api.js",
+          "line": 51,
+          "end_line": 59
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "purchase",
+      "lane": "account",
+      "col": 3,
+      "type": "backend",
+      "label": "Purchase RPC",
+      "sublabel": "Auth + funds + open market",
+      "tag": "Retry with same request ID",
+      "sources": [
+        {
+          "path": "src/api.js",
+          "line": 62,
+          "end_line": 71
+        },
+        {
+          "path": "src/useArena.js",
+          "line": 97,
+          "end_line": 107
+        },
+        {
+          "path": "supabase/migrations/20261114000000_initial_backend.sql",
+          "line": 130,
+          "end_line": 178
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "db",
+      "lane": "account",
+      "col": 4,
+      "type": "database",
+      "label": "Supabase ledger",
+      "sublabel": "Wallet + position + debit",
+      "tag": "One atomic transaction",
+      "sources": [
+        {
+          "path": "supabase/migrations/20261114000000_initial_backend.sql",
+          "line": 147,
+          "end_line": 176
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "accountportfolio",
+      "lane": "account",
+      "col": 5,
+      "type": "frontend",
+      "label": "Portfolio + rank",
+      "sublabel": "Refresh account records",
+      "tag": "Live UI test still pending",
+      "sources": [
+        {
+          "path": "src/api.js",
+          "line": 35,
+          "end_line": 48
+        },
+        {
+          "path": "src/useArena.js",
+          "line": 102,
+          "end_line": 107
+        },
+        {
+          "path": "README.md",
+          "line": 38,
+          "end_line": 45
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "settlement",
+      "lane": "settlement",
+      "col": 4,
+      "type": "security",
+      "label": "Settlement RPC",
+      "sublabel": "Trusted service role only",
+      "tag": "Resolve after close",
+      "sources": [
+        {
+          "path": "supabase/migrations/20261114000000_initial_backend.sql",
+          "line": 181,
+          "end_line": 203
+        },
+        {
+          "path": "supabase/migrations/20261114000000_initial_backend.sql",
+          "line": 278,
+          "end_line": 283
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "credits",
+      "lane": "settlement",
+      "col": 5,
+      "type": "database",
+      "label": "Payout or refund",
+      "sublabel": "Win 2x / cancel refunds",
+      "tag": "Idempotent settlement",
+      "sources": [
+        {
+          "path": "supabase/migrations/20261114000000_initial_backend.sql",
+          "line": 193,
+          "end_line": 224
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "brief",
+      "lane": "oracle",
+      "col": 2,
+      "type": "frontend",
+      "label": "Ask The Oracle",
+      "sublabel": "Selected account market",
+      "sources": [
+        {
+          "path": "src/api.js",
+          "line": 92,
+          "end_line": 105
+        },
+        {
+          "path": "src/pages/Oracle.jsx",
+          "line": 12,
+          "end_line": 23
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "oracleauth",
+      "lane": "oracle",
+      "col": 3,
+      "type": "security",
+      "label": "Server checks",
+      "sublabel": "Verify user + load record",
+      "tag": "Needs Gemini configuration",
+      "sources": [
+        {
+          "path": "api/oracle.js",
+          "line": 13,
+          "end_line": 36
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "gemini",
+      "lane": "oracle",
+      "col": 4,
+      "type": "cloud",
+      "label": "Gemini analysis",
+      "sublabel": "Match facts + coin rules",
+      "tag": "No account details sent",
+      "sources": [
+        {
+          "path": "api/oracle.js",
+          "line": 38,
+          "end_line": 52
+        }
+      ],
+      "width": 143,
+      "height": 68
+    },
+    {
+      "id": "explanation",
+      "lane": "oracle",
+      "col": 5,
+      "type": "frontend",
+      "label": "Match explanation",
+      "sublabel": "Plain text + limitations",
+      "tag": "Not a verified forecast",
+      "sources": [
+        {
+          "path": "src/pages/Oracle.jsx",
+          "line": 24,
+          "end_line": 28
+        },
+        {
+          "path": "api/oracle.js",
+          "line": 51,
+          "end_line": 54
+        }
+      ],
+      "width": 143,
+      "height": 68
+    }
+  ],
+  "edges": [
+    {
+      "from": "explore",
+      "to": "mode"
+    },
+    {
+      "from": "mode",
+      "to": "sample",
+      "label": "Practice",
+      "role": "branch"
+    },
+    {
+      "from": "sample",
+      "to": "localtrade",
+      "label": "Confirm"
+    },
+    {
+      "from": "localtrade",
+      "to": "browserstore"
+    },
+    {
+      "from": "browserstore",
+      "to": "practiceportfolio"
+    },
+    {
+      "from": "mode",
+      "to": "auth",
+      "label": "Account",
+      "role": "branch",
+      "variant": "security"
+    },
+    {
+      "from": "auth",
+      "to": "review",
+      "label": "Signed in"
+    },
+    {
+      "from": "review",
+      "to": "purchase",
+      "label": "Confirm"
+    },
+    {
+      "from": "purchase",
+      "to": "db"
+    },
+    {
+      "from": "db",
+      "to": "accountportfolio",
+      "label": "Refresh"
+    },
+    {
+      "from": "settlement",
+      "to": "credits",
+      "label": "Trusted result",
+      "variant": "security"
+    },
+    {
+      "from": "credits",
+      "to": "accountportfolio",
+      "label": "Refresh later",
+      "role": "return",
+      "variant": "dashed"
+    },
+    {
+      "from": "review",
+      "to": "brief",
+      "label": "Optional",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "from": "brief",
+      "to": "oracleauth"
+    },
+    {
+      "from": "oracleauth",
+      "to": "gemini",
+      "label": "Configured",
+      "variant": "dashed"
+    },
+    {
+      "from": "gemini",
+      "to": "explanation",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Implemented and tested locally",
+      "items": [
+        "Practice journey: 1,000 coins -> 100-coin purchase -> 900 balance -> winning result -> 1,100.",
+        "DOM checks cover rapid duplicate clicks, portfolio, transactions, ranking, filters, and legal navigation.",
+        "Account purchases persist one request ID before sending; retries reuse it. Practice and account data stay separate."
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Connected does not mean fully verified",
+      "items": [
+        "The deployed Supabase URL and public key are configured locally; the Auth settings request succeeded.",
+        "A confirmed-email test user is still needed for frontend signup, purchase, payout, and leaderboard checks.",
+        "A winning prediction returns 2x stake; a losing prediction returns zero; cancellation refunds the stake. All coins are simulated."
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "What remains / source checkpoint",
+      "items": [
+        "Subigya is preparing real FaZe CS2 fixtures; the current practice fixtures and schedules are illustrative.",
+        "The Oracle endpoint exists, but a server-side Gemini key and model are still required. No verified performance statistics are connected.",
+        "Desktop/mobile visual inspection, legal draft review, GitHub push, and Vercel deployment remain. This diagram cites local commit a428361; no frontend code has been pushed."
+      ]
+    }
+  ]
+}
